@@ -743,6 +743,12 @@ zbot.sendMessage(m.chat, { text : q ? q : '' , mentions: participants.map(a => a
 }
 
 break
+case 'ho': {
+if (!m.isGroup) throw mess.group
+zbot.sendMessage(m.chat, { text : q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: ftroli })
+}
+
+break
 case 'vote': {
 if (!m.isGroup) throw mess.group
 if (m.chat in vote) throw `_Masih ada vote di chat ini!_\n\n*${prefix}hapusvote* - untuk menghapus vote`
