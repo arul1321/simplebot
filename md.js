@@ -86,60 +86,6 @@ console.log(err)
 }
 })
 
-// Group Update
-zbot.ev.on('groups.update', async pea => {
-//console.log(pea)
-// Get Profile Picture Group
-try {
-ppgc = await zbot.profilePictureUrl(pea[0].id, 'image')
-} catch {
-ppgc = 'https://shortlink.zbotarridho.my.id/rg1oT'
-}
-let wm_fatih = { url : ppgc }
-if (pea[0].announce == true) {
-zbot.send5ButImg(pea[0].id, `「 Group Settings Change 」\n\nGroup telah ditutup oleh admin, Sekarang hanya admin yang dapat mengirim pesan !`, `Group Settings Change Message`, wm_fatih, [])
-} else if(pea[0].announce == false) {
-zbot.send5ButImg(pea[0].id, `「 Group Settings Change 」\n\nGroup telah dibuka oleh admin, Sekarang peserta dapat mengirim pesan !`, `Group Settings Change Message`, wm_fatih, [])
-} else if (pea[0].restrict == true) {
-zbot.send5ButImg(pea[0].id, `「 Group Settings Change 」\n\nInfo group telah dibatasi, Sekarang hanya admin yang dapat mengedit info group !`, `Group Settings Change Message`, wm_fatih, [])
-} else if (pea[0].restrict == false) {
-zbot.send5ButImg(pea[0].id, `「 Group Settings Change 」\n\nInfo group telah dibuka, Sekarang peserta dapat mengedit info group !`, `Group Settings Change Message`, wm_fatih, [])
-} else {
-zbot.send5ButImg(pea[0].id, `「 Group Settings Change 」\n\nGroup Subject telah diganti menjadi *${pea[0].subject}*`, `Group Settings Change Message`, wm_fatih, [])
-}
-})
-
-zbot.ev.on('group-participants.update', async (anu) => {
-console.log(anu)
-try {
-let metadata = await zbot.groupMetadata(anu.id)
-let participants = anu.participants
-for (let num of participants) {
-// Get Profile Picture User
-try {
-ppuser = await zbot.profilePictureUrl(num, 'image')
-} catch {
-ppuser = 'https://i0.wp.com/www.gambarunik.id/wp-content/uploads/2019/06/Top-Gambar-Foto-Profil-Kosong-Lucu-Tergokil-.jpg'
-}
-
-// Get Profile Picture Group
-try {
-ppgroup = await zbot.profilePictureUrl(anu.id, 'image')
-} catch {
-ppgroup = 'https://i0.wp.com/www.gambarunik.id/wp-content/uploads/2019/06/Top-Gambar-Foto-Profil-Kosong-Lucu-Tergokil-.jpg'
-}
-
-if (anu.action == 'add') {
-zbot.sendMessage(anu.id, { image: { url: ppuser }, contextInfo: { mentionedJid: [num] }, caption: `Welcome To ${metadata.subject} @${num.split("@")[0]}` })
-} else if (anu.action == 'remove') {
-zbot.sendMessage(anu.id, { image: { url: ppuser }, contextInfo: { mentionedJid: [num] }, caption: `@${num.split("@")[0]} Leaving To ${metadata.subject}` })
-}
-}
-} catch (err) {
-console.log(err)
-}
-})
-	
 // Setting
 zbot.decodeJid = (jid) => {
 if (!jid) return jid
