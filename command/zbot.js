@@ -109,7 +109,7 @@ if(isSticker === "imageMessage"){
 let mediaaan = await quoted.download().catch(e => {
 //m.reply(mess.erorr)
 })
-let encmedialik = await zbot.sendImageAsSticker(m.chat, mediaaan, m, { packname: ''Z-Bot'', author: ''Bot Whatsapp'' }).catch(e => {
+let encmedialik = await zbot.sendImageAsSticker(m.chat, mediaaan, m, { packname: 'Z-Bot', author: 'Bot Whatsapp' }).catch(e => {
 m.reply(` `)
 })
       }
