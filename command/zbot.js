@@ -479,8 +479,8 @@ Please Choose an Order Below
 ┌─❖ ⌜ Download Menu ⌟
 ├│${prefix}tiktok
 ├│${prefix}tiktokaudio
-├│${prefix}tovideo
-├│${prefix}tomp3
+├│${prefix}ytmp3
+├│${prefix}play
 └─❖
 ┌─❖ ⌜ Fun Menu ⌟
 ├│${prefix}jadian
