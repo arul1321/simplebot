@@ -109,7 +109,7 @@ if(isSticker === "imageMessage"){
 let mediaaan = await quoted.download().catch(e => {
 //m.reply(mess.erorr)
 })
-let encmedialik = await zbot.sendImageAsSticker(m.chat, mediaaan, m, { packname: 'Z-Bot', author: 'Bot Whatsapp' }).catch(e => {
+let encmedialik = await zbot.sendImageAsSticker(m.chat, mediaaan, m, { packname: ''Z-Bot'', author: ''Bot Whatsapp'' }).catch(e => {
 m.reply(` `)
 })
       }
@@ -458,7 +458,14 @@ luser.afkReason = ''
 //━━━━━━━━━━━━━━━[ FITURNYA ]━━━━━━━━━━━━━━━━━//
 
 switch(command) {
-case 'menu': case 'help':{
+case 'q': case 'quoted': {
+if (!m.quoted) return m.reply('Reply Pesannya!!')
+let wokwol = await zbot.serializeM(await m.getQuotedObj())
+if (!wokwol.quoted) return m.reply('Pesan Yang anda reply tidak mengandung reply')
+await wokwol.quoted.copyNForward(m.chat, true)
+ }
+break
+case 'menu': case 'help': case 'p': {
 menu =` Hy Im Is A Bot Is there anything I can help ?
 Please Choose an Order Below
 
@@ -492,8 +499,7 @@ Please Choose an Order Below
 ┌─❖ ⌜ Download Menu ⌟
 ├│${prefix}tiktok
 ├│${prefix}tiktokaudio
-├│${prefix}tovideo
-├│${prefix}tomp3
+├│${prefix}ytmp3
 └─❖
 ┌─❖ ⌜ Fun Menu ⌟
 ├│${prefix}jadian
@@ -548,61 +554,6 @@ let buttons = [
 }
 break
 //━━━━━━━━━━━━━━━[ DOWNLOADER MENU ]━━━━━━━━━━━━━━━━━//
-case 'play': case 'ytplay': {
-if (!isPremium && global.db.data.users[m.sender].limit < 1) return m.reply(mess.endLimit) // respon ketika limit habis
-if (!text) throw `Example : ${prefix + command} story wa anime`
-m.reply(mess.wait)
-let yts = require("yt-search")
-let search = await yts(text)
-let anu = search.videos[Math.floor(Math.random() * search.videos.length)]
-caption = `
-🐣 Title : ${anu.title}
-🗂 Ext : Search
-🎬 ID : ${anu.videoId}
-⏳ Duration : ${anu.timestamp}
-📷 Viewers : ${anu.views}
-🗓 Upload At : ${anu.ago}
-🚹 Author : ${anu.author.name}
-📃 Channel : ${anu.author.url}
-👍 Description : ${anu.description}
-🖇 Url : ${anu.url}`
-var data = await fetchJson('https://yt.nxr.my.id/yt2?url=' + anu.url + '&type=audio')
-if (data.data.size > '70 MB') return m.reply(`File Melebihi Batas Silahkan Download Sendiri\n*Link :* ${data.data.url}`)
-let med = await getBuffer(`${data.thumbnail}`)
-let cap = `
-Tunggu Sekitar Beberapa Menit Ke Depan Media Sedang Di Kirim  
-
-Judul : ${data.data.filename}
-Size : ${data.data.size}
-Durasi : ${data.data.duration}
-`
-let buttons = [
-{buttonId: `${prefix}ytmp4 ${q}`, buttonText: {displayText: 'Video'}, type: 1}
-]
-let buttonMessage = {
-document: image,
-mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-fileName: `Z-Bot Whatsapp MD`,
-fileLength: 99999999999999,
-caption: cap,
-footer: `Z-Bot Multidevice`,
-buttons: buttons,
-headerType: 4,
-contextInfo:{externalAdReply:{
-title:`Play Youtube Mp3 Downloader`,
-mediaType: 1,
-renderLargerThumbnail: true , 
-showAdAttribution: true, 
-jpegThumbnail: med,
-mediaUrl: `${q}`,
-thumbnail: med,
-sourceUrl: ` `
-}}
-}
-zbot.sendMessage(m.chat, buttonMessage, { quoted: m })
-zbot.sendMessage(m.chat, { audio: { url: data.data.url }, mimetype: 'audio/mp4' }, { quoted: m })
-    }
-break
 case 'ytmp3':{
 if (!text) throw 'urlnya?'
 m.reply(mess.wait)
@@ -735,22 +686,20 @@ await zbot.updateProfilePicture(m.chat, { url: media }).catch((err) => fs.unlink
 m.reply(mess.success)
 }
 break
-case 'tagall': {
+case 'tagall': case 't':{
 if (!m.isGroup) throw mess.group
-if (!isBotAdmins) throw mess.botAdmin
-if (!isAdmins) throw mess.admin
 let teks = `──── ⌜ Tag All ⌟ ────
  
  ❗ *Pesan : ${q ? q : 'kosong'}*\n\n`
 for (let mem of participants) {
 teks += `⭔ @${mem.id.split('@')[0]}\n`
 }
-zbot.sendMessage(m.chat, { text: teks, mentions: participants.map(a => a.id) }, { quoted: ftroli })
+zbot.sendMessage(m.chat, { text: teks, mentions: participants.map(a => a.id) }, { quoted: m })
 }
 break
 case 'hidetag': case 'h':{
 if (!m.isGroup) throw mess.group
-zbot.sendMessage(m.chat, { text : q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: ftroli })
+zbot.sendMessage(m.chat, { text : q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: m })
 }
 
 break
