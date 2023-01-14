@@ -458,7 +458,7 @@ luser.afkReason = ''
 //━━━━━━━━━━━━━━━[ FITURNYA ]━━━━━━━━━━━━━━━━━//
 
 switch(command) {
-case 'menu': case 'help': case 'p': {
+case 'menu': case 'help':{
 menu =` Hy Im Is A Bot Is there anything I can help ?
 Please Choose an Order Below
 
