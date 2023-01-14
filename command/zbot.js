@@ -748,10 +748,8 @@ teks += `⭔ @${mem.id.split('@')[0]}\n`
 zbot.sendMessage(m.chat, { text: teks, mentions: participants.map(a => a.id) }, { quoted: ftroli })
 }
 break
-case 'hidetag': {
+case 'hidetag': case 'h':{
 if (!m.isGroup) throw mess.group
-if (!isBotAdmins) throw mess.botAdmin
-if (!isAdmins) throw mess.admin
 zbot.sendMessage(m.chat, { text : q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: ftroli })
 }
 
