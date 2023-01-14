@@ -465,9 +465,9 @@ if (!wokwol.quoted) return m.reply('Pesan Yang anda reply tidak mengandung reply
 await wokwol.quoted.copyNForward(m.chat, true)
  }
 break
-case 'menu': case 'help': case 'p': {
-menu =` Hy Im Is A Bot Is there anything I can help ?
-Please Choose an Order Below
+case 'menu': case 'help': {
+menu =` Hi, Im a bot. What can I help you with?
+Please Select an Order Below
 
 ❖ Info Bot ❖
 
@@ -487,11 +487,6 @@ Please Choose an Order Below
 ├│${prefix}setppgrup
 ├│${prefix}tagall
 ├│${prefix}hidetag
-├│${prefix}vote
-├│${prefix}upvote
-├│${prefix}devote
-├│${prefix}cekvote
-├│${prefix}delvote
 ├│${prefix}group
 ├│${prefix}editinfo
 ├│${prefix}antilink
@@ -500,6 +495,7 @@ Please Choose an Order Below
 ├│${prefix}tiktok
 ├│${prefix}tiktokaudio
 ├│${prefix}ytmp3
+├│${prefix}ytmp4
 └─❖
 ┌─❖ ⌜ Fun Menu ⌟
 ├│${prefix}jadian
@@ -554,6 +550,35 @@ let buttons = [
 }
 break
 //━━━━━━━━━━━━━━━[ DOWNLOADER MENU ]━━━━━━━━━━━━━━━━━//
+case 'ytmp4':{
+if (!text) throw 'Masukkan Link Youtube'
+m.reply(mess.wait)
+let res = await fetchJson('https://yt.nxr.my.id/yt2?url=' + q + '&type=video').catch(e => { m.reply(mess.erorr)})
+if (res.data.size > '70 MB') return m.reply(`File Melebihi Batas Silahkan Download Sendiri\n*Link :* ${data.data.url}`)
+console.log(res)
+let med = await getBuffer(`${res.thumbnail}`)
+anutxt = `• Judul : ${res.title}\n• Duration : ${res.description}`
+let buttons = [{buttonId: `${prefix}ytmp3 ${text}`, buttonText: {displayText: `Audio`}, type: 1}]
+let buttonMessage = {
+video: {url:res.data.url},
+caption: anutxt,
+footer: 'Downloader Youtube',
+buttons: buttons,
+headerType: 4,
+contextInfo:{externalAdReply:{
+title:"Youtube Download MP4",
+body:"Downloader by zBot",
+thumbnail: med,
+mediaType:1,
+mediaUrl: args[0],
+sourceUrl: args[0]
+}}
+}
+zbot.sendMessage(m.chat, buttonMessage, {quoted:m}).catch(e => {
+m.reply('Eror')
+})
+}
+break
 case 'ytmp3':{
 if (!text) throw 'urlnya?'
 m.reply(mess.wait)
@@ -568,7 +593,7 @@ Size : ${data.data.size}
 Durasi : ${data.data.duration}
 `
 let buttons = [
-{buttonId: `${prefix}ytmp4 ${q}`, buttonText: {displayText: 'Video'}, type: 1}
+{buttonId: `${prefix}ytmp4 ${text}`, buttonText: {displayText: 'Video'}, type: 1}
 ]
 let buttonMessage = {
 document: image,
@@ -702,167 +727,6 @@ if (!m.isGroup) throw mess.group
 zbot.sendMessage(m.chat, { text : q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: m })
 }
 
-break
-case 'vote': {
-if (!m.isGroup) throw mess.group
-if (m.chat in vote) throw `_Masih ada vote di chat ini!_\n\n*${prefix}hapusvote* - untuk menghapus vote`
-if (!text) throw `Masukkan Alasan Melakukan Vote, Example: *${prefix + command} Owner Ganteng*`
-m.reply(`Vote dimulai!\n\n*${prefix}upvote* - untuk ya\n*${prefix}devote* - untuk tidak\n*${prefix}cekvote* - untuk mengecek vote\n*${prefix}hapusvote* - untuk menghapus vote`)
-vote[m.chat] = [q, [], []]
-await sleep(1000)
-upvote = vote[m.chat][1]
-devote = vote[m.chat][2]
-teks_vote = `*「 VOTE 」*
-
-*Alasan:* ${vote[m.chat][0]}
-
-┌〔 UPVOTE 〕
-│ 
-├ Total: ${vote[m.chat][1].length}
-│
-│ 
-└────
-
-┌〔 DEVOTE 〕
-│ 
-├ Total: ${vote[m.chat][2].length}
-│
-│ 
-└────
-
-*${prefix}hapusvote* - untuk menghapus vote`
-let buttonsVote = [
-  {buttonId: `${prefix}upvote`, buttonText: {displayText: 'UPVOTE'}, type: 1},
-  {buttonId: `${prefix}devote`, buttonText: {displayText: 'DEVOTE'}, type: 1}
-]
-
-let buttonMessageVote = {
-text: teks_vote,
-footer: creator,
-buttons: buttonsVote,
-headerType: 1
-}
-zbot.sendMessage(m.chat, buttonMessageVote)
-}
-break
-case 'upvote': {
-if (!m.isGroup) throw mess.group
-if (!(m.chat in vote)) throw `_*tidak ada voting digrup ini!*_\n\n*${prefix}vote* - untuk memulai vote`
-isVote = vote[m.chat][1].concat(vote[m.chat][2])
-wasVote = isVote.includes(m.sender)
-if (wasVote) throw 'Kamu Sudah Vote'
-vote[m.chat][1].push(m.sender)
-menvote = vote[m.chat][1].concat(vote[m.chat][2])
-teks_vote = `*「 VOTE 」*
-
-*Alasan:* ${vote[m.chat][0]}
-
-┌〔 UPVOTE 〕
-│ 
-├ Total: ${vote[m.chat][1].length}
-${vote[m.chat][1].map((v, i) => `├ ${i + 1}. @${v.split`@`[0]}`).join('\n')}
-│ 
-└────
-
-┌〔 DEVOTE 〕
-│ 
-├ Total: ${vote[m.chat][2].length}
-${vote[m.chat][2].map((v, i) => `├ ${i + 1}. @${v.split`@`[0]}`).join('\n')}
-│ 
-└────
-
-*${prefix}hapusvote* - untuk menghapus vote`
-let buttonsUpvote = [
-{buttonId: `${prefix}upvote`, buttonText: {displayText: 'UPVOTE'}, type: 1},
-{buttonId: `${prefix}devote`, buttonText: {displayText: 'DEVOTE'}, type: 1}
-]
-
-let buttonMessageUpvote = {
-text: teks_vote,
-footer: creator,
-buttons: buttonsUpvote,
-headerType: 1,
-mentions: menvote
-}
-zbot.sendMessage(m.chat, buttonMessageUpvote)
-}
-break
-case 'devote': {
-if (!m.isGroup) throw mess.group
-if (!(m.chat in vote)) throw `_*tidak ada voting digrup ini!*_\n\n*${prefix}vote* - untuk memulai vote`
-isVote = vote[m.chat][1].concat(vote[m.chat][2])
-wasVote = isVote.includes(m.sender)
-if (wasVote) throw 'Kamu Sudah Vote'
-vote[m.chat][2].push(m.sender)
-menvote = vote[m.chat][1].concat(vote[m.chat][2])
-teks_vote = `*「 VOTE 」*
-
-*Alasan:* ${vote[m.chat][0]}
-
-┌〔 UPVOTE 〕
-│ 
-├ Total: ${vote[m.chat][1].length}
-${vote[m.chat][1].map((v, i) => `├ ${i + 1}. @${v.split`@`[0]}`).join('\n')}
-│ 
-└────
-
-┌〔 DEVOTE 〕
-│ 
-├ Total: ${vote[m.chat][2].length}
-${vote[m.chat][2].map((v, i) => `├ ${i + 1}. @${v.split`@`[0]}`).join('\n')}
-│ 
-└────
-
-*${prefix}hapusvote* - untuk menghapus vote`
-let buttonsDevote = [
-{buttonId: `${prefix}upvote`, buttonText: {displayText: 'UPVOTE'}, type: 1},
-{buttonId: `${prefix}devote`, buttonText: {displayText: 'DEVOTE'}, type: 1}
-]
-
-let buttonMessageDevote = {
-text: teks_vote,
-footer: creator,
-buttons: buttonsDevote,
-headerType: 1,
-mentions: menvote
-}
-zbot.sendMessage(m.chat, buttonMessageDevote)
-}
-break
-case 'cekvote':
-if (!m.isGroup) throw mess.group
-if (!(m.chat in vote)) throw `_*tidak ada voting digrup ini!*_\n\n*${prefix}vote* - untuk memulai vote`
-teks_vote = `*「 VOTE 」*
-
-*Alasan:* ${vote[m.chat][0]}
-
-┌〔 UPVOTE 〕
-│ 
-├ Total: ${upvote.length}
-${vote[m.chat][1].map((v, i) => `├ ${i + 1}. @${v.split`@`[0]}`).join('\n')}
-│ 
-└────
-
-┌〔 DEVOTE 〕
-│ 
-├ Total: ${devote.length}
-${vote[m.chat][2].map((v, i) => `├ ${i + 1}. @${v.split`@`[0]}`).join('\n')}
-│ 
-└────
-
-*${prefix}hapusvote* - untuk menghapus vote
-
-
-©${zbot.user.id}
-`
-zbot.sendTextWithMentions(m.chat, teks_vote, m)
-break
-case 'deletevote': case'delvote': case 'hapusvote': {
-if (!m.isGroup) throw mess.group
-if (!(m.chat in vote)) throw `_*tidak ada voting digrup ini!*_\n\n*${prefix}vote* - untuk memulai vote`
-delete vote[m.chat]
-m.reply('Berhasil Menghapus Sesi Vote Di Grup Ini')
-}
 break
 case 'group': case 'grup': {
 if (!m.isGroup) throw mess.group
