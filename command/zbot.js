@@ -147,7 +147,7 @@ if (db.data.settings[botNumber].autobio) {
 let setting = global.db.data.settings[botNumber]
 if (new Date() * 1 - setting.status > 1000) {
 let uptime = await runtime(process.uptime())
-await zbot.setStatus(`${zbot.user.name} | Runtime : ${runtime(uptime)}`)
+await zbot.setStatus(`Z-Bot Aktif | Erorr Lapor Owner`)
 setting.status = new Date() * 1
 }
 }
@@ -466,7 +466,7 @@ await wokwol.quoted.copyNForward(m.chat, true)
  }
 break
 case 'menu': case 'help': {
-menu =` Hi, Im a bot. What can I help you with?
+menu =`Hi, Im a bot. What can I help you with?
 Please Select an Order Below
 
 ❖ Info Bot ❖
@@ -585,27 +585,8 @@ m.reply(mess.wait)
 var data = await fetchJson('https://yt.nxr.my.id/yt2?url=' + q + '&type=audio')
 if (data.data.size > '70 MB') return m.reply(`File Melebihi Batas Silahkan Download Sendiri\n*Link :* ${data.data.url}`)
 let med = await getBuffer(`${data.thumbnail}`)
-let cap = `
-Tunggu Sekitar Beberapa Menit Ke Depan Media Sedang Di Kirim  
-
-Judul : ${data.data.filename}
-Size : ${data.data.size}
-Durasi : ${data.data.duration}
-`
-let buttons = [
-{buttonId: `${prefix}ytmp4 ${text}`, buttonText: {displayText: 'Video'}, type: 1}
-]
-let buttonMessage = {
-document: image,
-mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-fileName: `Z-Bot Whatsapp MD`,
-fileLength: 99999999999999,
-caption: cap,
-footer: `Z-Bot Multidevice`,
-buttons: buttons,
-headerType: 4,
-contextInfo:{externalAdReply:{
-title:`Play Youtube Mp3 Downloader`,
+zbot.sendMessage(m.chat, {audio:{url: data.data.url}, mimetype:"audio/mp4", ptt:false, contextInfo:{externalAdReply:{
+title:`${data.data.filename}`,
 mediaType: 1,
 renderLargerThumbnail: true , 
 showAdAttribution: true, 
@@ -613,16 +594,22 @@ jpegThumbnail: med,
 mediaUrl: `${q}`,
 thumbnail: med,
 sourceUrl: ` `
-}}
-}
-zbot.sendMessage(m.chat, buttonMessage, { quoted: m })
-zbot.sendMessage(m.chat, { audio: { url: data.data.url }, mimetype: 'audio/mp4' }, { quoted: m })
+}}}, {quoted:ftroli})
 }
 break
 case 'ttmp3': case 'tiktokaudio':  
 if(!text) return replyig(`Penggunaan ${prefix + command} teks|teks`)
 m.reply(mess.wait)  
-bocil.tiktokdl(`${q}`).then( data => {zbot.sendMessage(m.chat, { audio: { url: data.video.no_watermark }, mimetype: 'audio/mp4' }, { quoted: m })}).catch(() => m.reply(`Erorr`))
+bocil.tiktokdl(`${q}`).then( data => {zbot.sendMessage(m.chat, {audio:{url: data.video.no_watermark}, mimetype:"audio/mp4", ptt:false, contextInfo:{externalAdReply:{
+title:`${data.data.filename}`,
+mediaType: 1,
+renderLargerThumbnail: true , 
+showAdAttribution: true, 
+jpegThumbnail: med,
+mediaUrl: `${q}`,
+thumbnail: med,
+sourceUrl: ` `
+}}}, {quoted:ftroli})}).catch(() => m.reply(`Erorr`))
 break
 case 'tt': case 'ttmp4': case 'tiktok': case 'tiktoknowm':{
 if (!text) throw 'Masukkan Link Tiktok'
@@ -1256,34 +1243,31 @@ let anu = groups.map(v => v.id)
 m.reply(`Mengirim Broadcast Ke ${anu.length} Group Chat, Waktu Selesai ${anu.length * 1.5} detik`)
 for (let i of anu) {
 await sleep(1500)
-let btn = [{
-urlButton: {
-displayText: 'Rest Api`s',
-url: 'https://zbot-api.xyz'
-}
-}, {
-urlButton: {
-displayText: 'My Youtube',
-url: 'https://youtube.com/zbot'
-}
-}, {
-quickReplyButton: {
-displayText: 'Status Bot',
-id: 'ping'
-}
-}, {
-quickReplyButton: {
-displayText: 'Contact Owner',
-id: 'owner'
-}  
-}, {
-quickReplyButton: {
-displayText: 'Script',
-id: 'sc'
-}
-}]
-let txt = `「 Broadcast Bot 」\n\n${text}`
-zbot.send5ButImg(i, txt, creator, image, btn)
+let txt = `*${text}*`
+let buttons = [
+            {buttonId: `${prefix}owner`, buttonText: {displayText: 'Owner'}, type: 1}
+            ]
+            let buttonMessage = {
+            document: image,
+            mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            fileName: `Izin Broadcast Bang`,
+            fileLength: 99999999999999,
+            caption: txt,
+            footer: `Z-Bot Multidevice`,
+            buttons: buttons,
+            headerType: 4,
+            contextInfo:{externalAdReply:{
+            title:`Broadcast Z-Bot`,
+            mediaType: 1,
+            renderLargerThumbnail: true , 
+            showAdAttribution: true, 
+            jpegThumbnail: image,
+            mediaUrl: `instagram.com/_daaa_1`,
+            thumbnail: image,
+            sourceUrl: ` `
+            }}
+            }
+            zbot.sendMessage(m.chat, buttonMessage, { quoted: m })
 }
 m.reply(`Sukses Mengirim Broadcast Ke ${anu.length} Group`)
 }
