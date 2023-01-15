@@ -597,19 +597,22 @@ sourceUrl: ` `
 }}}, {quoted:ftroli})
 }
 break
-case 'ttmp3': case 'tiktokaudio':  
+case 'ttmp3': case 'tiktokaudio': {
 if(!text) return replyig(`Penggunaan ${prefix + command} teks|teks`)
-m.reply(mess.wait)  
-bocil.tiktokdl(`${q}`).then( data => {zbot.sendMessage(m.chat, {audio:{url: data.video.no_watermark}, mimetype:"audio/mp4", ptt:false, contextInfo:{externalAdReply:{
-title:`${data.data.filename}`,
+m.reply(mess.wait)
+var data = await bocil.tiktokdl(text)
+zbot.sendMessage(m.chat, {audio:{url: data.video.no_watermark}, mimetype:"audio/mp4", ptt:false, 
+contextInfo:{externalAdReply:{
+title:`Downloader Tiktok MP3`,
 mediaType: 1,
 renderLargerThumbnail: true , 
 showAdAttribution: true, 
-jpegThumbnail: med,
+jpegThumbnail: image,
 mediaUrl: `${q}`,
-thumbnail: med,
+thumbnail: image,
 sourceUrl: ` `
-}}}, {quoted:ftroli})}).catch(() => m.reply(`Erorr`))
+}}, {quoted:ftroli}})
+}
 break
 case 'tt': case 'ttmp4': case 'tiktok': case 'tiktoknowm':{
 if (!text) throw 'Masukkan Link Tiktok'
