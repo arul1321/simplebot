@@ -611,7 +611,7 @@ jpegThumbnail: image,
 mediaUrl: `${q}`,
 thumbnail: image,
 sourceUrl: ` `
-}}, {quoted:ftroli}})
+}}}, {quoted:ftroli})
 }
 break
 case 'tt': case 'ttmp4': case 'tiktok': case 'tiktoknowm':{
