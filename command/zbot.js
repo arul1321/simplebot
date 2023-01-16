@@ -808,6 +808,12 @@ await zbot.sendMessage(m.chat, { disappearingMessagesInChat: false }).then((res)
 }
 }
 break
+case 'upswteks':{
+if (!text) return m.reply('Isi teksnya!')
+zbot.sendText('status@broadcast', `${text}`)
+m.reply(`Sukses Up story wa teks ${text}`)
+}
+break
 case 'jadian': {
 if (!m.isGroup) throw mess.group
 let member = participants.map(u => u.id)
