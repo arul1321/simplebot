@@ -506,7 +506,6 @@ Please Select an Order Below
 ┌─❖ ⌜ Converter Menu ⌟
 ├│${prefix}sticker
 ├│${prefix}toimage
-├│${prefix}tovideo
 ├│${prefix}tomp3
 └─❖
 ┌─❖ ⌜ Owner Menu ⌟
@@ -808,9 +807,9 @@ await zbot.sendMessage(m.chat, { disappearingMessagesInChat: false }).then((res)
 }
 }
 break
-case 'upswteks':{
+case 'upsw':{
 if (!text) return m.reply('Isi teksnya!')
-zbot.sendText('status@broadcast', `${text}`)
+zbot.sendMessage('status@broadcast', { text:`${text}`})
 m.reply(`Sukses Up story wa teks ${text}`)
 }
 break
@@ -1017,17 +1016,6 @@ let media = await quoted.download()
 let { toAudio } = require('../message/converter')
 let audio = await toAudio(media, 'mp4')
 zbot.sendMessage(m.chat, {document: audio, mimetype: 'audio/mpeg', fileName: `Convert By ${zbot.user.name}.mp3`}, { quoted : m })
-}
-break
-case 'tomp4': case 'tovideo': {
-if (!quoted) throw 'Reply Image'
-if (!/webp/.test(mime)) throw `balas stiker dengan caption *${prefix + command}*`
-m.reply(mess.wait)
-let { webp2mp4File } = require('../message/uploader')
-let media = await zbot.downloadAndSaveMediaMessage(quoted)
-let webpToMp4 = await webp2mp4File(media)
-await zbot.sendMessage(m.chat, { video: { url: webpToMp4.result, caption: 'Convert Webp To Video' } }, { quoted: m })
-await fs.unlinkSync(media)
 }
 break
 case 'join': {
