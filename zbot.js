@@ -502,15 +502,10 @@ Please Select an Order Below
 ├│${prefix}jodohku
 ├│${prefix}tictactoe
 ├│${prefix}delttt
-├│${prefix}family100
-├│${prefix}tebak
-├│${prefix}math
-├│${prefix}suitpvp
 └─❖
 ┌─❖ ⌜ Converter Menu ⌟
 ├│${prefix}sticker
 ├│${prefix}toimage
-├│${prefix}tovideo
 ├│${prefix}tomp3
 └─❖
 ┌─❖ ⌜ Owner Menu ⌟
@@ -597,10 +592,12 @@ sourceUrl: ` `
 }}}, {quoted:ftroli})
 }
 break
-case 'ttmp3': case 'tiktokaudio':  
+case 'ttmp3': case 'tiktokaudio': {
 if(!text) return replyig(`Penggunaan ${prefix + command} teks|teks`)
-m.reply(mess.wait)  
-bocil.tiktokdl(`${q}`).then( data => {zbot.sendMessage(m.chat, {audio:{url: data.video.no_watermark}, mimetype:"audio/mp4", ptt:false, contextInfo:{externalAdReply:{
+m.reply(mess.wait)
+var data = await bocil.tiktokdl(text)
+zbot.sendMessage(m.chat, {audio:{url: data.video.no_watermark}, mimetype:"audio/mp4", ptt:false, 
+contextInfo:{externalAdReply:{
 title:`Downloader Tiktok MP3`,
 mediaType: 1,
 renderLargerThumbnail: true , 
@@ -609,7 +606,8 @@ jpegThumbnail: image,
 mediaUrl: `${q}`,
 thumbnail: image,
 sourceUrl: ` `
-}}}, {quoted:ftroli})}).catch(() => m.reply(`Erorr`))
+}}}, {quoted:ftroli})
+}
 break
 case 'tt': case 'ttmp4': case 'tiktok': case 'tiktoknowm':{
 if (!text) throw 'Masukkan Link Tiktok'
@@ -642,7 +640,7 @@ break
 case 'kick': {
 if (!m.isGroup) throw mess.group
 if (!isBotAdmins) throw mess.botAdmin
-if (!isAdmins) throw mess.admin
+if (!isCreator) throw mess.owner
 let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 await zbot.groupParticipantsUpdate(m.chat, [users], 'remove').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 }
@@ -650,7 +648,7 @@ break
 case 'add': {
 if (!m.isGroup) throw mess.group
 if (!isBotAdmins) throw mess.botAdmin
-if (!isAdmins) throw mess.admin
+if (!isCreator) throw mess.owner
 let users = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '')+'@s.whatsapp.net'
 await zbot.groupParticipantsUpdate(m.chat, [users], 'add').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 }
@@ -752,7 +750,7 @@ break
 case 'antilink': {
 if (!m.isGroup) throw mess.group
 if (!isBotAdmins) throw mess.botAdmin
-if (!isAdmins) throw mess.admin
+if (!isCreator) throw mess.owner
 if (args[0] === "on") {
 if (db.data.chats[m.chat].antilink) return m.reply(`Sudah Aktif Sebelumnya`)
 db.data.chats[m.chat].antilink = true
@@ -807,6 +805,12 @@ await zbot.sendMessage(m.chat, { disappearingMessagesInChat: WA_DEFAULT_EPHEMERA
 } else if (args[0] === 'disable') {
 await zbot.sendMessage(m.chat, { disappearingMessagesInChat: false }).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 }
+}
+break
+case 'upsw':{
+if (!text) return m.reply('Isi teksnya!')
+zbot.sendMessage('status@broadcast', { text:`${text}`})
+m.reply(`Sukses Up story wa teks ${text}`)
 }
 break
 case 'jadian': {
@@ -900,153 +904,6 @@ state: 'WAITING'
 if (text) room.name = text
 m.reply('Menunggu partner' + (text ? ` mengetik command dibawah ini ${prefix}${command} ${text}` : ''))
 this.game[room.id] = room
-}
-}
-break
-case 'family100': {
-if ('family100'+m.chat in _family100) {
-m.reply('Masih Ada Sesi Yang Belum Diselesaikan!')
-throw false
-}
-let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/family100.json')
-let random = anu[Math.floor(Math.random() * anu.length)]
-let hasil = `*Jawablah Pertanyaan Berikut :*\n${random.soal}\n\nTerdapat *${random.jawaban.length}* Jawaban ${random.jawaban.find(v => v.includes(' ')) ? `(beberapa Jawaban Terdapat Spasi)` : ''}`.trim()
-_family100['family100'+m.chat] = {
-id: 'family100'+m.chat,
-pesan: await zbot.sendText(m.chat, hasil, m),
-...random,
-terjawab: Array.from(random.jawaban, () => false),
-hadiah: 6,
-}
-}
-break
-case 'tebak': {
-if (!text) throw `Example : ${prefix + command} lagu\n\nOption : \n1. lagu\n2. gambar\n3. kata\n4. kalimat\n5. lirik\n6. lontong`
-if (args[0] === "lagu") {
-if (tebaklagu.hasOwnProperty(m.sender.split('@')[0])) throw "Masih Ada Sesi Yang Belum Diselesaikan!"
-let anu = await fetchJson('https://fatiharridho.github.io/tebaklagu.json')
-let result = anu[Math.floor(Math.random() * anu.length)]
-let msg = await zbot.sendMessage(m.chat, { audio: { url: result.link_song }, mimetype: 'audio/mpeg' }, { quoted: m })
-zbot.sendText(m.chat, `Lagu Tersebut Adalah Lagu dari?\n\nArtist : ${result.artist}\nWaktu : 60s`, msg).then(() => {
-tebaklagu[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
-})
-await sleep(60000)
-if (tebaklagu.hasOwnProperty(m.sender.split('@')[0])) {
-console.log("Jawaban: " + result.jawaban)
-zbot.sendButtonText(m.chat, [{ buttonId: 'tebak lagu', buttonText: { displayText: 'Tebak Lagu' }, type: 1 }], `Waktu Habis\nJawaban:  ${tebaklagu[m.sender.split('@')[0]]}\n\nIngin bermain? tekan button dibawah`, zbot.user.name, m)
-delete tebaklagu[m.sender.split('@')[0]]
-}
-} else if (args[0] === 'gambar') {
-if (tebakgambar.hasOwnProperty(m.sender.split('@')[0])) throw "Masih Ada Sesi Yang Belum Diselesaikan!"
-let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebakgambar.json')
-let result = anu[Math.floor(Math.random() * anu.length)]
-zbot.sendImage(m.chat, result.img, `Silahkan Jawab Soal Di Atas Ini\n\nDeskripsi : ${result.deskripsi}\nWaktu : 60s`, m).then(() => {
-tebakgambar[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
-})
-await sleep(60000)
-if (tebakgambar.hasOwnProperty(m.sender.split('@')[0])) {
-console.log("Jawaban: " + result.jawaban)
-zbot.sendButtonText(m.chat, [{ buttonId: 'tebak gambar', buttonText: { displayText: 'Tebak Gambar' }, type: 1 }], `Waktu Habis\nJawaban:  ${tebakgambar[m.sender.split('@')[0]]}\n\nIngin bermain? tekan button dibawah`, zbot.user.name, m)
-delete tebakgambar[m.sender.split('@')[0]]
-}
-} else if (args[0] === 'kata') {
-if (tebakkata.hasOwnProperty(m.sender.split('@')[0])) throw "Masih Ada Sesi Yang Belum Diselesaikan!"
-let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebakkata.json')
-let result = anu[Math.floor(Math.random() * anu.length)]
-zbot.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\n${result.soal}\nWaktu : 60s`, m).then(() => {
-tebakkata[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
-})
-await sleep(60000)
-if (tebakkata.hasOwnProperty(m.sender.split('@')[0])) {
-console.log("Jawaban: " + result.jawaban)
-zbot.sendButtonText(m.chat, [{ buttonId: 'tebak kata', buttonText: { displayText: 'Tebak Kata' }, type: 1 }], `Waktu Habis\nJawaban:  ${tebakkata[m.sender.split('@')[0]]}\n\nIngin bermain? tekan button dibawah`, zbot.user.name, m)
-delete tebakkata[m.sender.split('@')[0]]
-}
-} else if (args[0] === 'kalimat') {
-if (tebakkalimat.hasOwnProperty(m.sender.split('@')[0])) throw "Masih Ada Sesi Yang Belum Diselesaikan!"
-let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebakkalimat.json')
-let result = anu[Math.floor(Math.random() * anu.length)]
-zbot.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\n${result.soal}\nWaktu : 60s`, m).then(() => {
-tebakkalimat[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
-})
-await sleep(60000)
-if (tebakkalimat.hasOwnProperty(m.sender.split('@')[0])) {
-console.log("Jawaban: " + result.jawaban)
-zbot.sendButtonText(m.chat, [{ buttonId: 'tebak kalimat', buttonText: { displayText: 'Tebak Kalimat' }, type: 1 }], `Waktu Habis\nJawaban:  ${tebakkalimat[m.sender.split('@')[0]]}\n\nIngin bermain? tekan button dibawah`, zbot.user.name, m)
-delete tebakkalimat[m.sender.split('@')[0]]
-}
-} else if (args[0] === 'lirik') {
-if (tebaklirik.hasOwnProperty(m.sender.split('@')[0])) throw "Masih Ada Sesi Yang Belum Diselesaikan!"
-let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebaklirik.json')
-let result = anu[Math.floor(Math.random() * anu.length)]
-zbot.sendText(m.chat, `Ini Adalah Lirik Dari Lagu? : *${result.soal}*?\nWaktu : 60s`, m).then(() => {
-tebaklirik[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
-})
-await sleep(60000)
-if (tebaklirik.hasOwnProperty(m.sender.split('@')[0])) {
-console.log("Jawaban: " + result.jawaban)
-zbot.sendButtonText(m.chat, [{ buttonId: 'tebak lirik', buttonText: { displayText: 'Tebak Lirik' }, type: 1 }], `Waktu Habis\nJawaban:  ${tebaklirik[m.sender.split('@')[0]]}\n\nIngin bermain? tekan button dibawah`, zbot.user.name, m)
-delete tebaklirik[m.sender.split('@')[0]]
-}
-} else if (args[0] === 'lontong') {
-if (caklontong.hasOwnProperty(m.sender.split('@')[0])) throw "Masih Ada Sesi Yang Belum Diselesaikan!"
-let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/caklontong.json')
-let result = anu[Math.floor(Math.random() * anu.length)]
-zbot.sendText(m.chat, `*Jawablah Pertanyaan Berikut :*\n${result.soal}*\nWaktu : 60s`, m).then(() => {
-caklontong[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
-caklontong_desk[m.sender.split('@')[0]] = result.deskripsi
-})
-await sleep(60000)
-if (caklontong.hasOwnProperty(m.sender.split('@')[0])) {
-console.log("Jawaban: " + result.jawaban)
-zbot.sendButtonText(m.chat, [{ buttonId: 'tebak lontong', buttonText: { displayText: 'Tebak Lontong' }, type: 1 }], `Waktu Habis\nJawaban:  ${caklontong[m.sender.split('@')[0]]}\nDeskripsi : ${caklontong_desk[m.sender.split('@')[0]]}\n\nIngin bermain? tekan button dibawah`, zbot.user.name, m)
-delete caklontong[m.sender.split('@')[0]]
-delete caklontong_desk[m.sender.split('@')[0]]
-}
-}
-}
-break
-case 'kuismath': case 'math': {
-if (kuismath.hasOwnProperty(m.sender.split('@')[0])) throw "Masih Ada Sesi Yang Belum Diselesaikan!"
-let { genMath, modes } = require('../json/math')
-if (!text) throw `Mode: ${Object.keys(modes).join(' | ')}\nContoh penggunaan: ${prefix}math medium`
-let result = await genMath(text.toLowerCase())
-zbot.sendText(m.chat, `*Berapa hasil dari: ${result.soal.toLowerCase()}*?\n\nWaktu: ${(result.waktu / 1000).toFixed(2)} detik`, m).then(() => {
-kuismath[m.sender.split('@')[0]] = result.jawaban
-})
-await sleep(result.waktu)
-if (kuismath.hasOwnProperty(m.sender.split('@')[0])) {
-console.log("Jawaban: " + result.jawaban)
-m.reply("Waktu Habis\nJawaban: " + kuismath[m.sender.split('@')[0]])
-delete kuismath[m.sender.split('@')[0]]
-}
-}
-break
-case 'suitpvp': case 'suit': {
-this.suit = this.suit ? this.suit : {}
-let poin = 10
-let poin_lose = 10
-let timeout = 60000
-if (Object.values(this.suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.sender))) m.reply(`Selesaikan suit mu yang sebelumnya`)
-if (m.mentionedJid[0] === m.sender) return m.reply(`Tidak bisa bermain dengan diri sendiri !`)
-if (!m.mentionedJid[0]) return m.reply(`_Siapa yang ingin kamu tantang?_\nTag orangnya..\n\nContoh : ${prefix}suit @${owner[1]}`, m.chat, { mentions: [owner[1] + '@s.whatsapp.net'] })
-if (Object.values(this.suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.mentionedJid[0]))) throw `Orang yang kamu tantang sedang bermain suit bersama orang lain :(`
-let id = 'suit_' + new Date() * 1
-let caption = `_*SUIT PvP*_
-
-@${m.sender.split`@`[0]} menantang @${m.mentionedJid[0].split`@`[0]} untuk bermain suit
-
-Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
-this.suit[id] = {
-chat: await zbot.sendText(m.chat, caption, m, { mentions: parseMention(caption) }),
-id: id,
-p: m.sender,
-p2: m.mentionedJid[0],
-status: 'wait',
-waktu: setTimeout(() => {
-if (this.suit[id]) zbot.sendText(m.chat, `_Waktu suit habis_`, m)
-delete this.suit[id]
-}, 60000), poin, poin_lose, timeout
 }
 }
 break
@@ -1159,17 +1016,6 @@ let media = await quoted.download()
 let { toAudio } = require('../message/converter')
 let audio = await toAudio(media, 'mp4')
 zbot.sendMessage(m.chat, {document: audio, mimetype: 'audio/mpeg', fileName: `Convert By ${zbot.user.name}.mp3`}, { quoted : m })
-}
-break
-case 'tomp4': case 'tovideo': {
-if (!quoted) throw 'Reply Image'
-if (!/webp/.test(mime)) throw `balas stiker dengan caption *${prefix + command}*`
-m.reply(mess.wait)
-let { webp2mp4File } = require('../message/uploader')
-let media = await zbot.downloadAndSaveMediaMessage(quoted)
-let webpToMp4 = await webp2mp4File(media)
-await zbot.sendMessage(m.chat, { video: { url: webpToMp4.result, caption: 'Convert Webp To Video' } }, { quoted: m })
-await fs.unlinkSync(media)
 }
 break
 case 'join': {
