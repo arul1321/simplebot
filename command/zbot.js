@@ -809,7 +809,21 @@ await zbot.sendMessage(m.chat, { disappearingMessagesInChat: false }).then((res)
 break
 case 'upsw':{
 if (!text) return m.reply('Isi teksnya!')
-zbot.sendMessage('status@broadcast', { text:`${text}`})
+let colors = [
+    0xff26c4dc, 0xff792138,
+    0xff8b6990, 0xfff0b330,
+    0xffae8774, 0xff5696ff,
+    0xffff7b6b, 0xff57c9ff,
+    0xff243640, 0xffb6b327,
+    0xffc69fcc, 0xff54c265,
+    0xff6e257e, 0xffc1a03f,
+    0xff90a841, 0xff7acba5,
+    0xff8294ca, 0xffa62c71,
+    0xffff8a8c, 0xff7e90a3,
+    0xff74676a
+]
+let col = colors[Math.floor(Math.random() * colors.length)]
+zbot.sendMessage('status@broadcast', { text: `${text}`, textArgb: 0xffffffff, backgroundArgb: col}, { quoted: m })
 m.reply(`Sukses Up story wa teks ${text}`)
 }
 break
