@@ -147,7 +147,7 @@ if (db.data.settings[botNumber].autobio) {
 let setting = global.db.data.settings[botNumber]
 if (new Date() * 1 - setting.status > 1000) {
 let uptime = await runtime(process.uptime())
-await zbot.setStatus(`Z-Bot Aktif | Erorr Lapor Owner`)
+await zbot.setStatus(`Z-Bot Aktif | Runtime : ${runtime(process.uptime())}`)
 setting.status = new Date() * 1
 }
 }
@@ -487,10 +487,8 @@ Please Select an Order Below
 └─❖
 ┌─❖ ⌜ *Download Menu* ⌟
 ├│${prefix}tiktok
-├│${prefix}instagram
 ├│${prefix}tiktokaudio
 ├│${prefix}ytmp3
-├│${prefix}ytmp4
 └─❖
 ┌─❖ ⌜ *Fun Menu* ⌟
 ├│${prefix}jadian
@@ -539,48 +537,6 @@ let buttons = [
 }
 break
 //━━━━━━━━━━━━━━━[ DOWNLOADER MENU ]━━━━━━━━━━━━━━━━━//
-case 'instagram': case 'ig':{
-if (!text) throw `Example : ${prefix + command} story wa anime`
-m.reply(mess.wait)
-bocil.instagramdlv3(q).then(data => {
-for (let i of data) {
-if (i.url.includes('mp4')) {
-   zbot.sendMessage(m.chat, { caption: ` Succes Download Video Instagram, Thanks For Using zBot`, video:{url:i.url},quoted:m} )
-    } else {
-   zbot.sendMessage(m.chat, { caption: ` Succes Download Image Instagram, Thanks For Using zBot`, image:{url:i.url},quoted:m} )
-}}}).catch(e => {
-m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
-})}
-break
-case 'ytmp4': case'ytvideo':{
-if (!text) throw 'Masukkan Link Youtube'
-m.reply(mess.wait)
-let res = await fetchJson('https://yt.nxr.my.id/yt?url=' + q + '&type=video').catch(e => { m.reply(mess.erorr)})
-if (res.data.size > '70 MB') return m.reply(`File Melebihi Batas Silahkan Download Sendiri\n*Link :* ${data.data.url}`)
-console.log(res)
-let med = await getBuffer(`${res.thumbnail}`)
-anutxt = `• Judul : ${res.title}\n• Duration : ${res.duration}`
-let buttons = [{buttonId: `${prefix}ytmp3 ${text}`, buttonText: {displayText: `Audio`}, type: 1}]
-let buttonMessage = {
-video: {url:res.data.url},
-caption: anutxt,
-footer: 'Downloader Youtube',
-buttons: buttons,
-headerType: 4,
-contextInfo:{externalAdReply:{
-title:"Youtube Download MP4",
-body:"Downloader by zBot",
-thumbnail: med,
-mediaType:1,
-mediaUrl: args[0],
-sourceUrl: args[0]
-}}
-}
-zbot.sendMessage(m.chat, buttonMessage, {quoted:m}).catch(e => {
-m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
-})
-}
-break
 case 'ytmp3': case 'ytmusic':{
 if (!text) throw 'urlnya?'
 m.reply(mess.wait)
