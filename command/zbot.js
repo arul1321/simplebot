@@ -458,26 +458,19 @@ luser.afkReason = ''
 //━━━━━━━━━━━━━━━[ FITURNYA ]━━━━━━━━━━━━━━━━━//
 
 switch(command) {
-case 'q': case 'quoted': {
-if (!m.quoted) return m.reply('Reply Pesannya!!')
-let wokwol = await zbot.serializeM(await m.getQuotedObj())
-if (!wokwol.quoted) return m.reply('Pesan Yang anda reply tidak mengandung reply')
-await wokwol.quoted.copyNForward(m.chat, true)
- }
-break
 case 'menu': case 'help': {
 menu =`Hi, Im a bot. What can I help you with?
 Please Select an Order Below
 
-❖ Info Bot ❖
+❖ *Info Bot* ❖
 
 🐰Bot Name : ${global.botname}
 🦅Owner : ${global.owner}
 🐶Owner Name : ${global.packname}
 
-❖ [ List All Menu ] ❖
+❖ [ *List All Menu* ] ❖
 
-┌─❖ ⌜ Group Menu ⌟
+┌─❖ ⌜  *Group Menu* ⌟
 ├│${prefix}kick
 ├│${prefix}add
 ├│${prefix}promote
@@ -490,25 +483,26 @@ Please Select an Order Below
 ├│${prefix}group
 ├│${prefix}editinfo
 ├│${prefix}antilink
+├│${prefix}ephemeral
 └─❖
-┌─❖ ⌜ Download Menu ⌟
+┌─❖ ⌜ *Download Menu* ⌟
 ├│${prefix}tiktok
+├│${prefix}instagram
 ├│${prefix}tiktokaudio
 ├│${prefix}ytmp3
 ├│${prefix}ytmp4
 └─❖
-┌─❖ ⌜ Fun Menu ⌟
+┌─❖ ⌜ *Fun Menu* ⌟
 ├│${prefix}jadian
 ├│${prefix}jodohku
 ├│${prefix}tictactoe
 ├│${prefix}delttt
 └─❖
-┌─❖ ⌜ Converter Menu ⌟
+┌─❖ ⌜ *Converter Menu* ⌟
 ├│${prefix}sticker
 ├│${prefix}toimage
-├│${prefix}tomp3
 └─❖
-┌─❖ ⌜ Owner Menu ⌟
+┌─❖ ⌜ *Owner Menu* ⌟
 ├│${prefix}ping
 ├│${prefix}owner
 ├│${prefix}join
@@ -545,14 +539,27 @@ let buttons = [
 }
 break
 //━━━━━━━━━━━━━━━[ DOWNLOADER MENU ]━━━━━━━━━━━━━━━━━//
-case 'ytmp4':{
+case 'instagram': case 'ig':{
+if (!text) throw `Example : ${prefix + command} story wa anime`
+m.reply(mess.wait)
+bocil.instagramdlv3(q).then(data => {
+for (let i of data) {
+if (i.url.includes('mp4')) {
+   zbot.sendMessage(m.chat, { caption: ` Succes Download Video Instagram, Thanks For Using zBot`, video:{url:i.url},quoted:m} )
+    } else {
+   zbot.sendMessage(m.chat, { caption: ` Succes Download Image Instagram, Thanks For Using zBot`, image:{url:i.url},quoted:m} )
+}}}).catch(e => {
+m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
+})}
+break
+case 'ytmp4': case'ytvideo':{
 if (!text) throw 'Masukkan Link Youtube'
 m.reply(mess.wait)
-let res = await fetchJson('https://yt.nxr.my.id/yt2?url=' + q + '&type=video').catch(e => { m.reply(mess.erorr)})
+let res = await fetchJson('https://yt.nxr.my.id/yt?url=' + q + '&type=video').catch(e => { m.reply(mess.erorr)})
 if (res.data.size > '70 MB') return m.reply(`File Melebihi Batas Silahkan Download Sendiri\n*Link :* ${data.data.url}`)
 console.log(res)
 let med = await getBuffer(`${res.thumbnail}`)
-anutxt = `• Judul : ${res.title}\n• Duration : ${res.description}`
+anutxt = `• Judul : ${res.title}\n• Duration : ${res.duration}`
 let buttons = [{buttonId: `${prefix}ytmp3 ${text}`, buttonText: {displayText: `Audio`}, type: 1}]
 let buttonMessage = {
 video: {url:res.data.url},
@@ -570,11 +577,11 @@ sourceUrl: args[0]
 }}
 }
 zbot.sendMessage(m.chat, buttonMessage, {quoted:m}).catch(e => {
-m.reply('Eror')
+m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
 })
 }
 break
-case 'ytmp3':{
+case 'ytmp3': case 'ytmusic':{
 if (!text) throw 'urlnya?'
 m.reply(mess.wait)
 var data = await fetchJson('https://yt.nxr.my.id/yt2?url=' + q + '&type=audio')
@@ -589,7 +596,9 @@ jpegThumbnail: med,
 mediaUrl: `${q}`,
 thumbnail: med,
 sourceUrl: ` `
-}}}, {quoted:ftroli})
+}}}, {quoted:ftroli}).catch(e => {
+m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
+})
 }
 break
 case 'ttmp3': case 'tiktokaudio': {
@@ -606,10 +615,12 @@ jpegThumbnail: image,
 mediaUrl: `${q}`,
 thumbnail: image,
 sourceUrl: ` `
-}}}, {quoted:ftroli})
+}}}, {quoted:ftroli}).catch(e => {
+m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
+})
 }
 break
-case 'tt': case 'ttmp4': case 'tiktok': case 'tiktoknowm':{
+case 'ttdl': case 'tt': case 'ttmp4': case 'tiktok': case 'tiktoknowm':{
 if (!text) throw 'Masukkan Link Tiktok'
 m.reply(mess.wait)
 let res = await bocil.tiktokdl(text).catch(e => { m.reply(mess.erorr)})
@@ -632,7 +643,7 @@ sourceUrl: args[0]
 }}
 }
 zbot.sendMessage(m.chat, buttonMessage, {quoted:m}).catch(e => {
-m.reply('Eror')
+m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
 })
 }
 break
@@ -696,7 +707,7 @@ await zbot.updateProfilePicture(m.chat, { url: media }).catch((err) => fs.unlink
 m.reply(mess.success)
 }
 break
-case 'tagall': case 't':{
+case 'tagall':{
 if (!m.isGroup) throw mess.group
 let teks = `──── ⌜ Tag All ⌟ ────
  
@@ -707,11 +718,10 @@ teks += `⭔ @${mem.id.split('@')[0]}\n`
 zbot.sendMessage(m.chat, { text: teks, mentions: participants.map(a => a.id) }, { quoted: m })
 }
 break
-case 'hidetag': case 'h':{
+case 'hidetag':{
 if (!m.isGroup) throw mess.group
 zbot.sendMessage(m.chat, { text : q ? q : '' , mentions: participants.map(a => a.id)}, { quoted: m })
 }
-
 break
 case 'group': case 'grup': {
 if (!m.isGroup) throw mess.group
@@ -805,26 +815,6 @@ await zbot.sendMessage(m.chat, { disappearingMessagesInChat: WA_DEFAULT_EPHEMERA
 } else if (args[0] === 'disable') {
 await zbot.sendMessage(m.chat, { disappearingMessagesInChat: false }).then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 }
-}
-break
-case 'upsw':{
-if (!text) return m.reply('Isi teksnya!')
-let colors = [
-    0xff26c4dc, 0xff792138,
-    0xff8b6990, 0xfff0b330,
-    0xffae8774, 0xff5696ff,
-    0xffff7b6b, 0xff57c9ff,
-    0xff243640, 0xffb6b327,
-    0xffc69fcc, 0xff54c265,
-    0xff6e257e, 0xffc1a03f,
-    0xff90a841, 0xff7acba5,
-    0xff8294ca, 0xffa62c71,
-    0xffff8a8c, 0xff7e90a3,
-    0xff74676a
-]
-let col = colors[Math.floor(Math.random() * colors.length)]
-zbot.sendMessage('status@broadcast', { text: `${text}`, textArgb: 0xffffffff, backgroundArgb: col}, { quoted: m })
-m.reply(`Sukses Up story wa teks ${text}`)
 }
 break
 case 'jadian': {
@@ -1001,6 +991,8 @@ if (err) throw err
 let buffer = fs.readFileSync(ran)
 zbot.sendMessage(m.chat, { image: buffer }, { quoted: ftroli })
 fs.unlinkSync(ran)
+}).catch(e => {
+m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
 })
 }
 break
@@ -1019,17 +1011,6 @@ await fs.unlinkSync(encmedia)
 } else {
 throw `Kirim Gambar/Video Dengan Caption ${prefix + command}\nDurasi Video 1-9 Detik`
 }
-}
-break
-case 'tomp3': {
-if (/document/.test(mime)) throw `Kirim/Reply Video/Audio Yang Ingin Dijadikan MP3 Dengan Caption ${prefix + command}`
-if (!/video/.test(mime) && !/audio/.test(mime)) throw `Kirim/Reply Video/Audio Yang Ingin Dijadikan MP3 Dengan Caption ${prefix + command}`
-if (!quoted) throw `Kirim/Reply Video/Audio Yang Ingin Dijadikan MP3 Dengan Caption ${prefix + command}`
-m.reply(mess.wait)
-let media = await quoted.download()
-let { toAudio } = require('../message/converter')
-let audio = await toAudio(media, 'mp4')
-zbot.sendMessage(m.chat, {document: audio, mimetype: 'audio/mpeg', fileName: `Convert By ${zbot.user.name}.mp3`}, { quoted : m })
 }
 break
 case 'join': {
