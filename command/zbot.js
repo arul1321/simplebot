@@ -1,9 +1,25 @@
 require('../options/config')
-var { BufferJSON, WA_DEFAULT_EPHEMERAL, generateWAMessageFromContent, proto, generateWAMessageContent, generateWAMessage, prepareWAMessageMedia, areJidsSameUser, getContentType } = require('@adiwajshing/baileys')
+var { 
+BufferJSON, 
+WA_DEFAULT_EPHEMERAL, 
+generateWAMessageFromContent, 
+proto, generateWAMessageContent, 
+generateWAMessage, 
+prepareWAMessageMedia, 
+areJidsSameUser, 
+getContentType } = require('@adiwajshing/baileys')
 var fs = require('fs')
 var util = require('util')
 var chalk = require('chalk')
-var { exec, spawn, execSync } = require("child_process")
+const {
+   yta,
+   ytv,
+   servers
+} = require('../message/y2mate.js')
+var { 
+exec, 
+spawn, 
+execSync } = require("child_process")
 var axios = require('axios')
 var path = require('path')
 var os = require('os')
@@ -12,7 +28,22 @@ var { JSDOM } = require('jsdom')
 var speed = require('performance-now')
 var { performance } = require('perf_hooks')
 const bocil = require('@bochilteam/scraper') 
-var { smsg, formatp, tanggal, formatDate, getTime, isUrl, sleep, clockString, runtime, fetchJson, getBuffer, jsonformat, format, parseMention, getRandom } = require('../message/myfunc')
+var { 
+smsg, 
+formatp, 
+tanggal, 
+formatDate, 
+getTime, 
+isUrl, 
+sleep, 
+clockString, 
+runtime, 
+fetchJson, 
+getBuffer, 
+jsonformat, 
+format, 
+parseMention, 
+getRandom } = require('../message/myfunc')
 
 //━━━━━━━━━━━━━━━[ THUMBNAIL ]━━━━━━━━━━━━━━━━━//
 
@@ -198,102 +229,6 @@ type: 'append'
 }
 zbot.ev.emit('messages.upsert', msg)
 }
-	    
-if (('family100'+m.chat in _family100) && isCmd) {
-kuis = true
-let room = _family100['family100'+m.chat]
-let teks = budy.toLowerCase().replace(/[^\w\s\-]+/, '')
-let isSurender = /^((me)?nyerah|surr?ender)$/i.test(m.text)
-if (!isSurender) {
-let index = room.jawaban.findIndex(v => v.toLowerCase().replace(/[^\w\s\-]+/, '') === teks)
-if (room.terjawab[index]) return !0
-room.terjawab[index] = m.sender
-}
-let isWin = room.terjawab.length === room.terjawab.filter(v => v).length
-let caption = `
-Jawablah Pertanyaan Berikut :\n${room.soal}\n\n\nTerdapat ${room.jawaban.length} Jawaban ${room.jawaban.find(v => v.includes(' ')) ? `(beberapa Jawaban Terdapat Spasi)` : ''}
-${isWin ? `Semua Jawaban Terjawab` : isSurender ? 'Menyerah!' : ''}
-${Array.from(room.jawaban, (jawaban, index) => {
-return isSurender || room.terjawab[index] ? `(${index + 1}) ${jawaban} ${room.terjawab[index] ? '@' + room.terjawab[index].split('@')[0] : ''}`.trim() : false
-}).filter(v => v).join('\n')}
-${isSurender ? '' : `Perfect Player`}`.trim()
-zbot.sendText(m.chat, caption, m, { contextInfo: { mentionedJid: parseMention(caption) }}).then(mes => { return _family100['family100'+m.chat].pesan = mesg }).catch(_ => _)
-if (isWin || isSurender) delete _family100['family100'+m.chat]
-}
-
-if (tebaklagu.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
-kuis = true
-jawaban = tebaklagu[m.sender.split('@')[0]]
-if (budy.toLowerCase() == jawaban) {
-await zbot.sendButtonText(m.chat, [{ buttonId: 'tebak lagu', buttonText: { displayText: 'Tebak Lagu' }, type: 1 }], `🎮 Tebak Lagu 🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? tekan button dibawah`, creator, m)
-delete tebaklagu[m.sender.split('@')[0]]
-} else m.reply('*Jawaban Salah!*')
-}
-
-if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
-kuis = true
-jawaban = kuismath[m.sender.split('@')[0]]
-if (budy.toLowerCase() == jawaban) {
-await m.reply(`🎮 Kuis Matematika  🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? kirim ${prefix}math mode`)
-delete kuismath[m.sender.split('@')[0]]
-} else m.reply('*Jawaban Salah!*')
-}
-
-if (tebakgambar.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
-kuis = true
-jawaban = tebakgambar[m.sender.split('@')[0]]
-if (budy.toLowerCase() == jawaban) {
-await zbot.sendButtonText(m.chat, [{ buttonId: 'tebak gambar', buttonText: { displayText: 'Tebak Gambar' }, type: 1 }], `🎮 Tebak Gambar 🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? tekan button dibawah`, creator, m)
-delete tebakgambar[m.sender.split('@')[0]]
-} else m.reply('*Jawaban Salah!*')
-}
-
-if (tebakkata.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
-kuis = true
-jawaban = tebakkata[m.sender.split('@')[0]]
-if (budy.toLowerCase() == jawaban) {
-await zbot.sendButtonText(m.chat, [{ buttonId: 'tebak kata', buttonText: { displayText: 'Tebak Kata' }, type: 1 }], `🎮 Tebak Kata 🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? tekan button dibawah`, creator, m)
-delete tebakkata[m.sender.split('@')[0]]
-} else m.reply('*Jawaban Salah!*')
-}
-
-if (caklontong.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
-kuis = true
-jawaban = caklontong[m.sender.split('@')[0]]
-deskripsi = caklontong_desk[m.sender.split('@')[0]]
-if (budy.toLowerCase() == jawaban) {
-await zbot.sendButtonText(m.chat, [{ buttonId: 'tebak lontong', buttonText: { displayText: 'Tebak Lontong' }, type: 1 }], `🎮 Cak Lontong 🎮\n\nJawaban Benar 🎉\n*${deskripsi}*\n\nIngin bermain lagi? tekan button dibawah`, creator, m)
-delete caklontong[m.sender.split('@')[0]]
-delete caklontong_desk[m.sender.split('@')[0]]
-} else m.reply('*Jawaban Salah!*')
-}
-
-if (tebakkalimat.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
-kuis = true
-jawaban = tebakkalimat[m.sender.split('@')[0]]
-if (budy.toLowerCase() == jawaban) {
-await zbot.sendButtonText(m.chat, [{ buttonId: 'tebak kalimat', buttonText: { displayText: 'Tebak Kalimat' }, type: 1 }], `🎮 Tebak Kalimat 🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? tekan button dibawah`, creator, m)
-delete tebakkalimat[m.sender.split('@')[0]]
-} else m.reply('*Jawaban Salah!*')
-}
-
-if (tebaklirik.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
-kuis = true
-jawaban = tebaklirik[m.sender.split('@')[0]]
-if (budy.toLowerCase() == jawaban) {
-await zbot.sendButtonText(m.chat, [{ buttonId: 'tebak lirik', buttonText: { displayText: 'Tebak Lirik' }, type: 1 }], `🎮 Tebak Lirik 🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? tekan button dibawah`, creator, m)
-delete tebaklirik[m.sender.split('@')[0]]
-} else m.reply('*Jawaban Salah!*')
-}
-	    
-if (tebaktebakan.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
-kuis = true
-jawaban = tebaktebakan[m.sender.split('@')[0]]
-if (budy.toLowerCase() == jawaban) {
-await zbot.sendButtonText(m.chat, [{ buttonId: 'tebak tebakan', buttonText: { displayText: 'Tebak Tebakan' }, type: 1 }], `🎮 Tebak Tebakan 🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? tekan button dibawah`, creator, m)
-delete tebaktebakan[m.sender.split('@')[0]]
-} else m.reply('*Jawaban Salah!*')
-}
 
 this.game = this.game ? this.game : {}
 let room = Object.values(this.game).find(room => room.id && room.game && room.state && room.id.startsWith('tictactoe') && [room.game.playerX, room.game.playerO].includes(m.sender) && room.state == 'PLAYING')
@@ -358,107 +293,10 @@ if (isTie || isWin) {
 delete this.game[room.id]
 }
 }
-
-this.suit = this.suit ? this.suit : {}
-let roof = Object.values(this.suit).find(roof => roof.id && roof.status && [roof.p, roof.p2].includes(m.sender))
-if (roof) {
-let win = ''
-let tie = false
-if (m.sender == roof.p2 && /^(acc(ept)?|terima|gas|oke?|tolak|gamau|nanti|ga(k.)?bisa|y)/i.test(m.text) && m.isGroup && roof.status == 'wait') {
-if (/^(tolak|gamau|nanti|n|ga(k.)?bisa)/i.test(m.text)) {
-zbot.sendTextWithMentions(m.chat, `@${roof.p2.split`@`[0]} menolak suit, suit dibatalkan`, m)
-delete this.suit[roof.id]
-return !0
-}
-roof.status = 'play'
-roof.asal = m.chat
-clearTimeout(roof.waktu)
-//delete roof[roof.id].waktu
-zbot.sendText(m.chat, `Suit telah dikirimkan ke chat
-
-@${roof.p.split`@`[0]} dan 
-@${roof.p2.split`@`[0]}
-
-Silahkan pilih suit di chat masing"
-klik https://wa.me/${botNumber.split`@`[0]}`, m, { mentions: [roof.p, roof.p2] })
-if (!roof.pilih) zbot.sendText(roof.p, `Silahkan pilih \n\nBatu🗿\nKertas📄\nGunting✂️`, m)
-if (!roof.pilih2) zbot.sendText(roof.p2, `Silahkan pilih \n\nBatu🗿\nKertas📄\nGunting✂️`, m)
-roof.waktu_milih = setTimeout(() => {
-if (!roof.pilih && !roof.pilih2) zbot.sendText(m.chat, `Kedua pemain tidak niat main,\nSuit dibatalkan`)
-else if (!roof.pilih || !roof.pilih2) {
-win = !roof.pilih ? roof.p2 : roof.p
-zbot.sendTextWithMentions(m.chat, `@${(roof.pilih ? roof.p2 : roof.p).split`@`[0]} tidak memilih suit, game berakhir`, m)
-}
-delete this.suit[roof.id]
-return !0
-}, roof.timeout)
-}
-let jwb = m.sender == roof.p
-let jwb2 = m.sender == roof.p2
-let g = /gunting/i
-let b = /batu/i
-let k = /kertas/i
-let reg = /^(gunting|batu|kertas)/i
-if (jwb && reg.test(m.text) && !roof.pilih && !m.isGroup) {
-roof.pilih = reg.exec(m.text.toLowerCase())[0]
-roof.text = m.text
-m.reply(`Kamu telah memilih ${m.text} ${!roof.pilih2 ? `\n\nMenunggu lawan memilih` : ''}`)
-if (!roof.pilih2) zbot.sendText(roof.p2, '_Lawan sudah memilih_\nSekarang giliran kamu', 0)
-}
-if (jwb2 && reg.test(m.text) && !roof.pilih2 && !m.isGroup) {
-roof.pilih2 = reg.exec(m.text.toLowerCase())[0]
-roof.text2 = m.text
-m.reply(`Kamu telah memilih ${m.text} ${!roof.pilih ? `\n\nMenunggu lawan memilih` : ''}`)
-if (!roof.pilih) zbot.sendText(roof.p, '_Lawan sudah memilih_\nSekarang giliran kamu', 0)
-}
-let stage = roof.pilih
-let stage2 = roof.pilih2
-if (roof.pilih && roof.pilih2) {
-clearTimeout(roof.waktu_milih)
-if (b.test(stage) && g.test(stage2)) win = roof.p
-else if (b.test(stage) && k.test(stage2)) win = roof.p2
-else if (g.test(stage) && k.test(stage2)) win = roof.p
-else if (g.test(stage) && b.test(stage2)) win = roof.p2
-else if (k.test(stage) && b.test(stage2)) win = roof.p
-else if (k.test(stage) && g.test(stage2)) win = roof.p2
-else if (stage == stage2) tie = true
-zbot.sendText(roof.asal, `_*Hasil Suit*_${tie ? '\nSERI' : ''}
-
-@${roof.p.split`@`[0]} (${roof.text}) ${tie ? '' : roof.p == win ? ` Menang \n` : ` Kalah \n`}
-@${roof.p2.split`@`[0]} (${roof.text2}) ${tie ? '' : roof.p2 == win ? ` Menang \n` : ` Kalah \n`}
-`.trim(), m, { mentions: [roof.p, roof.p2] })
-delete this.suit[roof.id]
-}
-}
-	    
-let mentionUser = [...new Set([...(m.mentionedJid || []), ...(m.quoted ? [m.quoted.sender] : [])])]
-for (let jid of mentionUser) {
-let user = global.db.data.users[jid]
-if (!user) continue
-let afkTime = user.afkTime
-if (!afkTime || afkTime < 0) continue
-let reason = user.afkReason || ''
-m.reply(`
-Jangan tag dia!
-Dia sedang AFK ${reason ? 'dengan alasan ' + reason : 'tanpa alasan'}
-Selama ${clockString(new Date - afkTime)}
-`.trim())
-}
-
-if (db.data.users[m.sender].afkTime > -1) {
-let user = global.db.data.users[m.sender]
-m.reply(`
-Kamu berhenti AFK${user.afkReason ? ' setelah ' + user.afkReason : ''}
-Selama ${clockString(new Date - user.afkTime)}
-`.trim())
-user.afkTime = -1
-luser.afkReason = ''
-}
-
 //━━━━━━━━━━━━━━━[ FITURNYA ]━━━━━━━━━━━━━━━━━//
-
 switch(command) {
 case 'menu': case 'help': {
+var p = '```'
 menu =`Hi, Im a bot. What can I help you with?
 Please Select an Order Below
 
@@ -471,44 +309,46 @@ Please Select an Order Below
 ❖ [ *List All Menu* ] ❖
 
 ┌─❖ ⌜  *Group Menu* ⌟
-├│${prefix}kick
-├│${prefix}add
-├│${prefix}promote
-├│${prefix}demote
-├│${prefix}setname
-├│${prefix}setdesc
-├│${prefix}setppgrup
-├│${prefix}tagall
-├│${prefix}hidetag
-├│${prefix}group
-├│${prefix}editinfo
-├│${prefix}antilink
-├│${prefix}ephemeral
+│${p}${prefix}kick${p}
+│${p}${prefix}add${p}
+│${p}${prefix}promote${p}
+│${p}${prefix}demote${p}
+│${p}${prefix}setname${p}
+│${p}${prefix}setdesc${p}
+│${p}${prefix}setppgrup${p}
+│${p}${prefix}tagall${p}
+│${p}${prefix}hidetag${p}
+│${p}${prefix}group${p}
+│${p}${prefix}editinfo${p}
+│${p}${prefix}antilink${p}
+│${p}${prefix}ephemeral${p}
 └─❖
 ┌─❖ ⌜ *Download Menu* ⌟
-├│${prefix}tiktok
-├│${prefix}tiktokaudio
-├│${prefix}ytmp3
+│${p}${prefix}gitclone${p}
+│${p}${prefix}tiktok${p}
+│${p}${prefix}tiktokaudio${p}
+│${p}${prefix}ytmp3${p}
 └─❖
 ┌─❖ ⌜ *Fun Menu* ⌟
-├│${prefix}jadian
-├│${prefix}jodohku
-├│${prefix}tictactoe
-├│${prefix}delttt
+│${p}${prefix}jadian${p}
+│${p}${prefix}jodohku${p}
+│${p}${prefix}tictactoe${p}
+│${p}${prefix}delttt${p}
 └─❖
 ┌─❖ ⌜ *Converter Menu* ⌟
-├│${prefix}sticker
-├│${prefix}toimage
+│${p}${prefix}telestick${p}
+│${p}${prefix}sticker${p}
+│${p}${prefix}toimage${p}
 └─❖
 ┌─❖ ⌜ *Owner Menu* ⌟
-├│${prefix}ping
-├│${prefix}owner
-├│${prefix}join
-├│${prefix}leave
-├│${prefix}block
-├│${prefix}unblock
-├│${prefix}bc
-├│${prefix}bcgc
+│${p}${prefix}ping${p}
+│${p}${prefix}owner${p}
+│${p}${prefix}join${p}
+│${p}${prefix}leave${p}
+│${p}${prefix}block${p}
+│${p}${prefix}unblock${p}
+│${p}${prefix}bc${p}
+│${p}${prefix}bcgc${p}
 └─❖`
 let buttons = [
             {buttonId: `${prefix}owner`, buttonText: {displayText: 'Owner'}, type: 1}
@@ -537,6 +377,45 @@ let buttons = [
 }
 break
 //━━━━━━━━━━━━━━━[ DOWNLOADER MENU ]━━━━━━━━━━━━━━━━━//
+case 'telestik': case 'telestick': case 'stickertele':{
+let packName = args[0].replace("https://t.me/addstickers/", "")
+let gas = await fetchJson(`https://api.telegram.org/bot891038791:AAHWB1dQd-vi0IbH2NjKYUk-hqQ8rQuzPD4/getStickerSet?name=${encodeURIComponent(packName)}`, { method: "GET", headers: { "User-Agent": "GoogleBot" } }).catch((err) => {
+m.reply(`Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂`)
+})
+m.reply(`*Total stiker:* ${gas.result.stickers.length}
+*Estimasi selesai:* ${gas.result.stickers.length * 1.5} detik`.trim())
+for (let i = 0; i < gas.result.stickers.length; i++) {
+let fileId = gas.result.stickers[i].thumb.file_id
+let gasIn = await fetchJson(`https://api.telegram.org/bot891038791:AAHWB1dQd-vi0IbH2NjKYUk-hqQ8rQuzPD4/getFile?file_id=${fileId}`)
+let stick = "https://api.telegram.org/file/bot891038791:AAHWB1dQd-vi0IbH2NjKYUk-hqQ8rQuzPD4/" + gasIn.result.file_path
+let media = await getBuffer(stick)
+zbot.sendImageAsSticker(m.chat, media, m, { packname: global.packname, author: global.author })
+}
+}
+break 
+case 'gitclone':{
+if (!text) throw 'urlnya?'
+m.reply(mess.wait) 
+const regex = /(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i
+let [_, user, repo] = args[0].match(regex) || []
+repo = repo.replace(/.git$/, "")
+let url = `https://api.github.com/repos/${user}/${repo}/zipball`
+let filename = `${repo}`
+zbot.sendMessage(m.chat, {document: {url: `${url}`}, mimetype: 'application/zip', fileName: `${filename}`, 
+contextInfo:{externalAdReply:{
+title:`Downloader Github`,
+mediaType: 1,
+renderLargerThumbnail: true , 
+showAdAttribution: true, 
+jpegThumbnail: image,
+mediaUrl: `${q}`,
+thumbnail: image,
+sourceUrl: ` `
+}}}, {quoted:m}).catch((err) => {
+m.reply(`Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂`)
+  })
+}
+break
 case 'ytmp3': case 'ytmusic':{
 if (!text) throw 'urlnya?'
 m.reply(mess.wait)
@@ -552,7 +431,7 @@ jpegThumbnail: med,
 mediaUrl: `${q}`,
 thumbnail: med,
 sourceUrl: ` `
-}}}, {quoted:ftroli}).catch(e => {
+}}}, {quoted:m}).catch(e => {
 m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
 })
 }
@@ -571,7 +450,7 @@ jpegThumbnail: image,
 mediaUrl: `${q}`,
 thumbnail: image,
 sourceUrl: ` `
-}}}, {quoted:ftroli}).catch(e => {
+}}}, {quoted:m}).catch(e => {
 m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
 })
 }
