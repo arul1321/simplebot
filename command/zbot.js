@@ -378,6 +378,8 @@ let buttons = [
 break
 //━━━━━━━━━━━━━━━[ DOWNLOADER MENU ]━━━━━━━━━━━━━━━━━//
 case 'telestik': case 'telestick': case 'stickertele':{
+if (!text) throw 'urlnya?'
+m.reply(mess.wait) 
 let packName = args[0].replace("https://t.me/addstickers/", "")
 let gas = await fetchJson(`https://api.telegram.org/bot891038791:AAHWB1dQd-vi0IbH2NjKYUk-hqQ8rQuzPD4/getStickerSet?name=${encodeURIComponent(packName)}`, { method: "GET", headers: { "User-Agent": "GoogleBot" } }).catch((err) => {
 m.reply(`Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂`)
