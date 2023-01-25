@@ -11,11 +11,6 @@ getContentType } = require('@adiwajshing/baileys')
 var fs = require('fs')
 var util = require('util')
 var chalk = require('chalk')
-const {
-   yta,
-   ytv,
-   servers
-} = require('../message/y2mate.js')
 var { 
 exec, 
 spawn, 
