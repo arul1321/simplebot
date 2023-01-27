@@ -337,6 +337,7 @@ Please Select an Order Below
 │${p}${prefix}setdesc${p}
 │${p}${prefix}setppgrup${p}
 │${p}${prefix}tagall${p}
+│${p}${prefix}totag${p}
 │${p}${prefix}hidetag${p}
 │${p}${prefix}group${p}
 │${p}${prefix}editinfo${p}
@@ -348,8 +349,11 @@ Please Select an Order Below
 │${p}${prefix}tiktok${p}
 │${p}${prefix}tiktokaudio${p}
 │${p}${prefix}ytmp3${p}
+│${p}${prefix}ytmp4${p}
+│${p}${prefix}play${p}
 └─❖
 ┌─❖ ⌜ *Fun Menu* ⌟
+│${p}${prefix}del${p}
 │${p}${prefix}jadian${p}
 │${p}${prefix}jodohku${p}
 │${p}${prefix}tictactoe${p}
@@ -578,6 +582,12 @@ m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
 }
 break
 //━━━━━━━━━━━━━━━[ GROUP MENU ]━━━━━━━━━━━━━━━━━//
+case 'totag': {
+if (!m.isGroup) throw mess.group
+if (!m.quoted) throw `Reply pesan dengan caption ${prefix + command}`
+zbot.sendMessage(m.chat, { forward: m.quoted.fakeObj, mentions: participants.map(a => a.id) })
+}
+break
 case 'kick': {
 if (!m.isGroup) throw mess.group
 if (!isBotAdmins) throw mess.botAdmin
