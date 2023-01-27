@@ -107,10 +107,10 @@ let chats = global.db.data.chats[m.chat]
 if (typeof chats !== 'object') global.db.data.chats[m.chat] = {}
 if (chats) {
 if (!('mute' in chats)) chats.mute = false
-if (!('antilink' in chats)) chats.antilink = false
+if (!('antilink' in chats)) chats.antilink = true
 } else global.db.data.chats[m.chat] = {
 mute: false,
-antilink: false,
+antilink: true,
 }
 
 var creator = '©Created By : Z-Bot'
@@ -129,17 +129,36 @@ autobio: true,
 console.error(err)
 }
 
+//━━━━━━━━━━━━━━━[ AUTO STICKER ]━━━━━━━━━━━━━━━━━//
 let isSticker = m.mtype
 if (isSticker) {
 if(isSticker === "imageMessage"){
 let mediaaan = await quoted.download().catch(e => {
 //m.reply(mess.erorr)
 })
-let encmedialik = await zbot.sendImageAsSticker(m.chat, mediaaan, m, { packname: 'Z-Bot', author: 'Bot Whatsapp' }).catch(e => {
-m.reply(` `)
+let encmedialik = await zbot.sendImageAsSticker(m.chat, mediaaan, m, { packname: 'Z-Bot', author: 'Bot Whatsapp' }).catch(e => {console.log(` `)
 })
       }
     }
+
+//━━━━━━━━━━━━━━━[ AUTO DELETE FOTO IN GROUP ]━━━━━━━━━━━━━━━━━//
+let Delt = m.mtype
+let lihj = await getBuffer(`https://ibb.co/FHgrkLn`)
+if (Delt) {
+if(Delt === "imageMessage"){
+let key = {}
+try {
+key.remoteJid = m.quoted ? m.quoted.fakeObj.key.remoteJid : m.key.remoteJid
+key.fromMe = m.quoted ? m.quoted.fakeObj.key.fromMe : m.key.fromMe
+key.id = m.quoted ? m.quoted.fakeObj.key.id : m.key.id
+ key.participant = m.quoted ? m.quoted.fakeObj.participant : m.key.participant
+ } catch (e) {
+ 	console.error(e)
+ }
+await zbot.sendMessage(m.chat, { delete: key})
+}
+}
+
 //━━━━━━━━━━━━━━━[ PUBLIC & SELF ]━━━━━━━━━━━━━━━━━//
 
 if (!zbot.public) {
@@ -179,18 +198,24 @@ setting.status = new Date() * 1
 }
 	    
 //━━━━━━━━━━━━━━━[ FUNCTION GROUP ]━━━━━━━━━━━━━━━━━//
-
 if (db.data.chats[m.chat].antilink) {
 if (budy.match(`chat.whatsapp.com`)) {
-m.reply(`「 ANTI LINK 」\n\nKamu terdeteksi mengirim link group, maaf kamu akan di kick !`)
-if (!isBotAdmins) return m.reply(`Ehh bot gak admin T_T`)
+if (!isBotAdmins) return console.log(``)
 let gclink = (`https://chat.whatsapp.com/`+await zbot.groupInviteCode(m.chat))
 let isLinkThisGc = new RegExp(gclink, 'i')
 let isgclink = isLinkThisGc.test(m.text)
-if (isgclink) return m.reply(`Ehh maaf gak jadi, karena kamu ngirim link group ini`)
-if (isAdmins) return m.reply(`Ehh maaf kamu admin`)
-if (isCreator) return m.reply(`Ehh maaf kamu owner bot ku`)
-zbot.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
+if (isgclink) return m.reply(`Ini Link Grup nya kak`)
+let key = {}
+try {
+key.remoteJid = m.quoted ? m.quoted.fakeObj.key.remoteJid : m.key.remoteJid
+key.fromMe = m.quoted ? m.quoted.fakeObj.key.fromMe : m.key.fromMe
+key.id = m.quoted ? m.quoted.fakeObj.key.id : m.key.id
+ key.participant = m.quoted ? m.quoted.fakeObj.participant : m.key.participant
+ } catch (e) {
+ 	console.error(e)
+ }
+zbot.sendMessage(m.chat, { delete: key})
+//zbot.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
 }
 }
         
@@ -372,6 +397,65 @@ let buttons = [
 }
 break
 //━━━━━━━━━━━━━━━[ DOWNLOADER MENU ]━━━━━━━━━━━━━━━━━//
+case 'delete': case 'del': {
+if (!m.quoted) throw false
+let key = {}
+ try {
+ 	key.remoteJid = m.quoted ? m.quoted.fakeObj.key.remoteJid : m.key.remoteJid
+	key.fromMe = m.quoted ? m.quoted.fakeObj.key.fromMe : m.key.fromMe
+	key.id = m.quoted ? m.quoted.fakeObj.key.id : m.key.id
+ 	key.participant = m.quoted ? m.quoted.fakeObj.participant : m.key.participant
+ } catch (e) {
+ 	console.error(e)
+ }
+ zbot.sendMessage(m.chat, { delete: key })
+            }
+            break
+case 'play': case 'ytplay': {
+if (!q) throw `Example : ${prefix + command} coding`
+let yts = require("yt-search")
+let search = await yts(q)
+console.log(search)
+let anu = search.videos[0]
+let gam = await getBuffer(anu.thumbnail)
+let buttons = [
+                    {buttonId: `${prefix}ytmp3 ${anu.url}`, buttonText: {displayText: '♫ Audio'}, type: 1},
+                    {buttonId: `${prefix}ytmp4 ${anu.url}`, buttonText: {displayText: '► Video'}, type: 1}
+                ]
+let cap=`
+❌ Title : ${anu.title}
+⭕ Ext : Search
+❌ ID : ${anu.videoId}
+⭕ Duration : ${anu.timestamp}
+❌ Viewers : ${anu.views}
+⭕ Upload At : ${anu.ago}
+❌ Author : ${anu.author.name}
+⭕ Channel : ${anu.author.url}
+❌ Description : ${anu.description}
+⭕ Url : ${anu.url}`
+let buttonMessage = {
+document: gam,
+mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+fileName: `Z-Bot Whatsapp MD`,
+fileLength: 99999999999999,
+caption: cap,
+footer: `Z-Bot Multidevice`,
+buttons: buttons,
+ headerType: 4,
+ contextInfo:{externalAdReply:{
+ title:`Play Youtube Downloader`,
+ mediaType: 1,
+ renderLargerThumbnail: true , 
+ showAdAttribution: true, 
+ jpegThumbnail: gam,
+ mediaUrl: `instagram.com/_daaa_1`,
+ thumbnail: gam,
+ sourceUrl: ` `
+            }}
+            }
+  zbot.sendMessage(m.chat, buttonMessage, { quoted: m })
+            }
+  break
 case 'telestik': case 'telestick': case 'stickertele':{
 if (!text) throw 'urlnya?'
 m.reply(mess.wait) 
@@ -417,7 +501,6 @@ case 'ytmp3': case 'ytmusic':{
 if (!text) throw 'urlnya?'
 m.reply(mess.wait)
 var data = await fetchJson('https://yt.nxr.my.id/yt2?url=' + q + '&type=audio')
-if (data.data.size > '70 MB') return m.reply(`File Melebihi Batas Silahkan Download Sendiri\n*Link :* ${data.data.url}`)
 let med = await getBuffer(`${data.thumbnail}`)
 zbot.sendMessage(m.chat, {audio:{url: data.data.url}, mimetype:"audio/mp4", ptt:false, contextInfo:{externalAdReply:{
 title:`${data.data.filename}`,
@@ -431,6 +514,21 @@ sourceUrl: ` `
 }}}, {quoted:m}).catch(e => {
 m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
 })
+}
+break
+case 'ytmp4':{
+if (!text) throw 'urlnya?'
+m.reply(mess.wait)
+var data = await fetchJson('https://yt.nxr.my.id/yt2?url=' + q + '&type=video').catch((err) => {
+m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
+  })
+if (data.data.size > '70 MB') return m.reply(`File Melebihi Batas Silahkan Download Sendiri\n*Link :* ${data.data.url}`)
+let vid = await getBuffer(`${data.data.url}`).catch((err) => {
+m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
+  })
+zbot.sendMessage(m.chat, { video: vid, caption: data.data.filename }, { quoted: m }).catch((err) => {
+m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
+  })
 }
 break
 case 'ttmp3': case 'tiktokaudio': {
@@ -586,27 +684,6 @@ let buttons = [
 { buttonId: 'editinfo close', buttonText: { displayText: 'CLOSE' }, type: 1 }
 ]
 await zbot.sendButtonText(m.chat, buttons, `Mode Edit Info`, creator, m)
-}
-}
-break
-case 'antilink': {
-if (!m.isGroup) throw mess.group
-if (!isBotAdmins) throw mess.botAdmin
-if (!isCreator) throw mess.owner
-if (args[0] === "on") {
-if (db.data.chats[m.chat].antilink) return m.reply(`Sudah Aktif Sebelumnya`)
-db.data.chats[m.chat].antilink = true
-m.reply(`Antilink Aktif !`)
-} else if (args[0] === "off") {
-if (!db.data.chats[m.chat].antilink) return m.reply(`Sudah Tidak Aktif Sebelumnya`)
-db.data.chats[m.chat].antilink = false
-m.reply(`Antilink Tidak Aktif !`)
-} else {
-let buttons = [
-{ buttonId: 'antilink on', buttonText: { displayText: 'On' }, type: 1 },
-{ buttonId: 'antilink off', buttonText: { displayText: 'Off' }, type: 1 }
-]
-await zbot.sendButtonText(m.chat, buttons, `Mode Antilink`, creator, m)
 }
 }
 break
