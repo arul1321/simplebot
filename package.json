@@ -2,10 +2,10 @@
 "name": "ZeroYT7",
 "version": "1.2.3",
 "description": "Please A Subscribe Me On Youtube Zero YT7",
-"main": "md.js",
+"main": "index.js",
 "type": "commonjs",
 "scripts": {
-"start": "node md.js"
+"start": "node index.js"
 },
 "keywords": [
 "termux",
