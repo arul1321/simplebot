@@ -20,9 +20,11 @@ var path = require('path')
 var os = require('os')
 var moment = require('moment-timezone')
 var { JSDOM } = require('jsdom')
+const request = require('request')
 var speed = require('performance-now')
 var { performance } = require('perf_hooks')
 const bocil = require('@bochilteam/scraper') 
+const xfar = require('xfarr-api')
 var { 
 smsg, 
 formatp, 
@@ -39,10 +41,14 @@ jsonformat,
 format, 
 parseMention, 
 getRandom } = require('../message/myfunc')
+const QrCode = require('qrcode-reader')
+const qrcode = require('qrcode')
 
 //━━━━━━━━━━━━━━━[ THUMBNAIL ]━━━━━━━━━━━━━━━━━//
 
 var image = fs.readFileSync('./image/zbot.jpg')
+var imgcmd = fs.readFileSync('./image/command.jpg')
+var imgdwn = fs.readFileSync('./image/download.jpg')
 var thumbnail = fs.readFileSync('./image/thumbnail.jpg')
 
 //━━━━━━━━━━━━━━━[ DATABASE ]━━━━━━━━━━━━━━━━━//
@@ -108,9 +114,11 @@ if (typeof chats !== 'object') global.db.data.chats[m.chat] = {}
 if (chats) {
 if (!('mute' in chats)) chats.mute = false
 if (!('antilink' in chats)) chats.antilink = true
+if (!('antitoxic' in chats )) chats.antitoxic = true
 } else global.db.data.chats[m.chat] = {
 mute: false,
 antilink: true,
+antitoxic: true,
 }
 
 var creator = '©Created By : Z-Bot'
@@ -129,7 +137,7 @@ autobio: true,
 console.error(err)
 }
 
-//━━━━━━━━━━━━━━━[ AUTO STICKER ]━━━━━━━━━━━━━━━━━//
+//━━━━━━━━━━━━━━━[ AUTO SETTING ]━━━━━━━━━━━━━━━━━//
 let isSticker = m.mtype
 if (isSticker) {
 if(isSticker === "imageMessage"){
@@ -140,12 +148,96 @@ let encmedialik = await zbot.sendImageAsSticker(m.chat, mediaaan, m, { packname:
 })
       }
     }
+    
+if (/^https?:\/\/.*tiktok.com/i.test(m.text)) {
+let url = m.text.split(/\n| /i)[0]  
+let res = await bocil.tiktokdl(url).catch(e => { console.log(e)})
+console.log(res)
+anutxt = `• Author : ${res.author.nickname}\n• Description : ${res.description}`
+let buttons = [{buttonId: `${prefix}tiktokaudio ${url}`, buttonText: {displayText: `Audio`}, type: 1}]
+let buttonMessage = {
+video: {url:res.video.no_watermark},
+caption: anutxt,
+footer: 'Downloader Tiktok',
+buttons: buttons,
+headerType: 4,
+contextInfo:{externalAdReply:{
+title:"Tiktok Downloader No Watermak",
+body:"Downloader by zBot",
+thumbnail: image,
+mediaType:1,
+mediaUrl: args[0],
+sourceUrl: args[0]
+}}
+}
+zbot.sendMessage(m.chat, buttonMessage, {quoted:m}).catch(e => {console.log(` `)
+})
+}
 
-//━━━━━━━━━━━━━━━[ AUTO DELETE FOTO IN GROUP ]━━━━━━━━━━━━━━━━━//
-let Delt = m.mtype
-let lihj = await getBuffer(`https://ibb.co/FHgrkLn`)
-if (Delt) {
-if(Delt === "imageMessage"){
+if (/^https?:\/\/.*youtu/i.test(m.text)) {
+let url = m.text.split(/\n| /i)[0] 
+var data = await fetchJson('https://yt.nxr.my.id/yt2?url=' + url + '&type=audio')
+let med = await getBuffer(`${data.thumbnail}`)
+let buttons = [
+                    {buttonId: `${prefix}ytmp3 ${url}`, buttonText: {displayText: '♫ Audio'}, type: 1},
+                    {buttonId: `${prefix}ytmp4 ${url}`, buttonText: {displayText: '► Video'}, type: 1}
+                ]
+let cap=`
+❌ Title : ${data.data.filename}
+⭕ Duration : ${data.duration}
+❌ Viewers : ${data.views}
+⭕ Upload At : ${data.publish}
+❌ Channel : ${data.channel}
+⭕ Size : ${data.data.size}`
+let buttonMessage = {
+document: imgdwn,
+mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+fileName: `Z-Bot Whatsapp MD`,
+fileLength: 99999999999999,
+caption: cap,
+footer: `Z-Bot Multidevice`,
+buttons: buttons,
+ headerType: 4,
+ contextInfo:{externalAdReply:{
+ title:`Play Youtube Downloader`,
+ mediaType: 1,
+ renderLargerThumbnail: true , 
+ showAdAttribution: true, 
+ jpegThumbnail: imgdwn,
+ mediaUrl: `instagram.com/_daaa_1`,
+ thumbnail: imgdwn,
+ sourceUrl: ` `
+            }}
+            }
+  zbot.sendMessage(m.chat, buttonMessage, { quoted: m })
+	}
+	
+if (/^https?:\/\/.*github.com/i.test(m.text)) {
+let url2 = m.text.split(/\n| /i)[0] 
+const regex = /(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i
+let [_, user, repo] = url2.match(regex) || []
+repo = repo.replace(/.git$/, "")
+let url = `https://api.github.com/repos/${user}/${repo}/zipball`
+let filename = `${repo}`
+zbot.sendMessage(m.chat, {document: {url: `${url}`}, mimetype: 'application/zip', fileName: `${filename}`, 
+contextInfo:{externalAdReply:{
+title:`Downloader Github`,
+mediaType: 1,
+renderLargerThumbnail: true , 
+showAdAttribution: true, 
+jpegThumbnail: imgdwn,
+mediaUrl: `${q}`,
+thumbnail: imgdwn,
+sourceUrl: ` `
+}}}, {quoted:m}).catch((err) => {console.log(` `)
+  })
+  }
+
+//━━━━━━━━━━━━━━━[ AUTO DELETE TOXIC WORD ]━━━━━━━━━━━━━━━━━//
+let bad = ["kontol","njir","anjir","asu","ajg","anjg","anjing","babi","goblok","tlol","tolol","bbi","anj","a*su","memek","mmk","coli","ngen","ngentod","ntod","ngewe","c*li","ngwe","yatim"]
+const messagesD = body.slice(0).trim().split(/ +/).shift().toLowerCase()
+if (db.data.chats[m.chat].antitoxic) {
+if (bad.includes(messagesD)) {
 let key = {}
 try {
 key.remoteJid = m.quoted ? m.quoted.fakeObj.key.remoteJid : m.key.remoteJid
@@ -155,15 +247,16 @@ key.id = m.quoted ? m.quoted.fakeObj.key.id : m.key.id
  } catch (e) {
  	console.error(e)
  }
-await zbot.sendMessage(m.chat, { delete: key})
+zbot.sendMessage(m.chat, { delete: key})
 }
 }
-
 //━━━━━━━━━━━━━━━[ PUBLIC & SELF ]━━━━━━━━━━━━━━━━━//
 
 if (!zbot.public) {
+if (!isCreator) return
 if (!m.key.fromMe) return
 }
+zbot.public = false
 
 //━━━━━━━━━━━━━━━[ AUTO READ ]━━━━━━━━━━━━━━━━━//
 
@@ -317,14 +410,21 @@ delete this.game[room.id]
 switch(command) {
 case 'menu': case 'help': {
 var p = '```'
+let gat = `https://fileup.to/hSpP/All-Bot-Commands-6-2-2023_(1).png`
+let timestamp = speed()
+let latensi = speed() - timestamp
+neww = performance.now()
+oldd = performance.now()
 menu =`Hi, Im a bot. What can I help you with?
 Please Select an Order Below
 
 ❖ *Info Bot* ❖
 
-🐰Bot Name : ${global.botname}
-🦅Owner : ${global.owner}
-🐶Owner Name : ${global.packname}
+🐰Bot Name.     : ${global.botname}
+🦅Owner.            : ${global.owner}
+🐶Owner             : ${global.packname}
+⏳Runtime Bot  : ${runtime(process.uptime())}
+⏱️Speed.            : ${latensi.toFixed(4)} _Second_
 
 ❖ [ *List All Menu* ] ❖
 
@@ -341,18 +441,20 @@ Please Select an Order Below
 │${p}${prefix}hidetag${p}
 │${p}${prefix}group${p}
 │${p}${prefix}editinfo${p}
-│${p}${prefix}antilink${p}
 │${p}${prefix}ephemeral${p}
 └─❖
 ┌─❖ ⌜ *Download Menu* ⌟
-│${p}${prefix}gitclone${p}
-│${p}${prefix}tiktok${p}
-│${p}${prefix}tiktokaudio${p}
-│${p}${prefix}ytmp3${p}
-│${p}${prefix}ytmp4${p}
-│${p}${prefix}play${p}
+│${p}${prefix}gitclone url${p}
+│${p}${prefix}tiktok url${p}
+│${p}${prefix}tiktokaudio url${p}
+│${p}${prefix}ytmp3 url${p}
+│${p}${prefix}ytmp4 url${p}
+│${p}${prefix}play url${p}
 └─❖
-┌─❖ ⌜ *Fun Menu* ⌟
+┌─❖ ⌜ *Fun Menu / Other* ⌟
+│${p}${prefix}toqr${p}
+│${p}${prefix}readqr${p}
+│${p}${prefix}tinyurl${p}
 │${p}${prefix}del${p}
 │${p}${prefix}jadian${p}
 │${p}${prefix}jodohku${p}
@@ -360,11 +462,13 @@ Please Select an Order Below
 │${p}${prefix}delttt${p}
 └─❖
 ┌─❖ ⌜ *Converter Menu* ⌟
-│${p}${prefix}telestick${p}
+│${p}${prefix}telestick url${p}
 │${p}${prefix}sticker${p}
+│${p}${prefix}swm packname|author${p}
 │${p}${prefix}toimage${p}
 └─❖
 ┌─❖ ⌜ *Owner Menu* ⌟
+│${p}${prefix}creategroup${p}
 │${p}${prefix}ping${p}
 │${p}${prefix}owner${p}
 │${p}${prefix}join${p}
@@ -375,10 +479,10 @@ Please Select an Order Below
 │${p}${prefix}bcgc${p}
 └─❖`
 let buttons = [
-            {buttonId: `${prefix}owner`, buttonText: {displayText: 'Owner'}, type: 1}
+            {buttonId: `${prefix}owner`, buttonText: {displayText: 'Owner'}, type: 1}, {buttonId: `${prefix}ping`, buttonText: {displayText: 'Ping'}, type: 1}
             ]
             let buttonMessage = {
-            document: image,
+            document: imgcmd,
             mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
             fileName: `Z-Bot Whatsapp MD`,
             fileLength: 99999999999999,
@@ -391,9 +495,9 @@ let buttons = [
             mediaType: 1,
             renderLargerThumbnail: true , 
             showAdAttribution: true, 
-            jpegThumbnail: image,
+            jpegThumbnail: imgcmd,
             mediaUrl: `instagram.com/_daaa_1`,
-            thumbnail: image,
+            thumbnail: imgcmd,
             sourceUrl: ` `
             }}
             }
@@ -401,6 +505,19 @@ let buttons = [
 }
 break
 //━━━━━━━━━━━━━━━[ DOWNLOADER MENU ]━━━━━━━━━━━━━━━━━//
+case 'toqr':{
+  if (!q) return m.reply(' Please include link or text!')
+   let qyuer = await qrcode.toDataURL(q, { scale: 35 })
+   let data = new Buffer.from(qyuer.replace('data:image/png;base64,', ''), 'base64')
+   let buff = getRandom('.jpg')
+   await fs.writeFileSync('./'+buff, data)
+   let medi = fs.readFileSync('./' + buff)
+  await zbot.sendMessage(m.chat, { image: medi, caption:"Here you go!"}, { quoted: m }).catch(e => {
+m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
+})
+   setTimeout(() => { fs.unlinkSync(buff) }, 10000)
+  }
+  break
 case 'delete': case 'del': {
 if (!m.quoted) throw false
 let key = {}
@@ -438,7 +555,7 @@ let cap=`
 ❌ Description : ${anu.description}
 ⭕ Url : ${anu.url}`
 let buttonMessage = {
-document: gam,
+document: imgdwn,
 mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
 fileName: `Z-Bot Whatsapp MD`,
 fileLength: 99999999999999,
@@ -451,12 +568,13 @@ buttons: buttons,
  mediaType: 1,
  renderLargerThumbnail: true , 
  showAdAttribution: true, 
- jpegThumbnail: gam,
+ jpegThumbnail: imgdwn,
  mediaUrl: `instagram.com/_daaa_1`,
- thumbnail: gam,
+ thumbnail: imgdwn,
  sourceUrl: ` `
             }}
             }
+  await sleep(3000)
   zbot.sendMessage(m.chat, buttonMessage, { quoted: m })
             }
   break
@@ -492,9 +610,9 @@ title:`Downloader Github`,
 mediaType: 1,
 renderLargerThumbnail: true , 
 showAdAttribution: true, 
-jpegThumbnail: image,
+jpegThumbnail: imgdwn,
 mediaUrl: `${q}`,
-thumbnail: image,
+thumbnail: imgdwn,
 sourceUrl: ` `
 }}}, {quoted:m}).catch((err) => {
 m.reply(`Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂`)
@@ -505,15 +623,14 @@ case 'ytmp3': case 'ytmusic':{
 if (!text) throw 'urlnya?'
 m.reply(mess.wait)
 var data = await fetchJson('https://yt.nxr.my.id/yt2?url=' + q + '&type=audio')
-let med = await getBuffer(`${data.thumbnail}`)
 zbot.sendMessage(m.chat, {audio:{url: data.data.url}, mimetype:"audio/mp4", ptt:false, contextInfo:{externalAdReply:{
 title:`${data.data.filename}`,
 mediaType: 1,
 renderLargerThumbnail: true , 
 showAdAttribution: true, 
-jpegThumbnail: med,
+jpegThumbnail: imgdwn,
 mediaUrl: `${q}`,
-thumbnail: med,
+thumbnail: imgdwn,
 sourceUrl: ` `
 }}}, {quoted:m}).catch(e => {
 m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
@@ -536,7 +653,7 @@ m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
 }
 break
 case 'ttmp3': case 'tiktokaudio': {
-if(!text) return replyig(`Penggunaan ${prefix + command} teks|teks`)
+if(!text) return m.reply(`Penggunaan ${prefix + command} url`)
 m.reply(mess.wait)
 var data = await bocil.tiktokdl(text)
 zbot.sendMessage(m.chat, {audio:{url: data.video.no_watermark}, mimetype:"audio/mp4", ptt:false, 
@@ -545,9 +662,9 @@ title:`Downloader Tiktok MP3`,
 mediaType: 1,
 renderLargerThumbnail: true , 
 showAdAttribution: true, 
-jpegThumbnail: image,
+jpegThumbnail: imgdwn,
 mediaUrl: `${q}`,
-thumbnail: image,
+thumbnail: imgdwn,
 sourceUrl: ` `
 }}}, {quoted:m}).catch(e => {
 m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
@@ -582,6 +699,15 @@ m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
 }
 break
 //━━━━━━━━━━━━━━━[ GROUP MENU ]━━━━━━━━━━━━━━━━━//
+case 'creategroup':
+if (!isCreator) return m.reply(mess.owner)
+if (!q) return m.reply(`${prefix + command} name group|nomor`)
+top = text.split('|')[0]
+bot = text.split('|')[1]
+const group = await zbot.groupCreate(top, [bot + "@s.whatsapp.net"])
+m.reply(`Done`)
+zbot.sendMessage(group.id, { text: 'Halo!!' }) // say hello to everyone on the group
+break
 case 'totag': {
 if (!m.isGroup) throw mess.group
 if (!m.quoted) throw `Reply pesan dengan caption ${prefix + command}`
@@ -680,6 +806,17 @@ await zbot.sendButtonText(m.chat, buttons, `Mode Group`, creator, m)
 }
 }
 break
+case 'tinyurl':{
+   if(!q) return m.reply('link?')
+   request(`https://tinyurl.com/api-create.php?url=${q}`, function (error, response, body) {
+   try {
+  m.reply(body)
+  } catch (e) {
+  m.reply(e)
+  }
+  })
+  }
+ break
 case 'editinfo': {
 if (!m.isGroup) throw mess.group
 if (!isBotAdmins) throw mess.botAdmin
@@ -718,8 +855,9 @@ await zbot.sendButtonText(m.chat, buttons, `Mute Bot`, creator, m)
 }
 }
 break
-case 'linkgroup': case 'linkgc': {
+case 'linkgrup': case 'linkgroup': case 'linkgc': {
 if (!m.isGroup) throw mess.group
+if (!isBotAdmins) throw mess.botAdmin
 let response = await zbot.groupInviteCode(m.chat)
 zbot.sendText(m.chat, `https://chat.whatsapp.com/${response}\n\nLink Group : ${groupMetadata.subject}`, m, { detectLink: true })
 }
@@ -751,6 +889,20 @@ let buttons = [
 await zbot.sendButtonText(m.chat, buttons, jawab, creator, m, {mentions: menst})
 }
 break
+case 'readqr': {
+if (!quoted) throw `Kirim/Reply Image Dengan Caption ${prefix + command}`
+let buffer = await zbot.downloadAndSaveMediaMessage(quoted)
+var Jimp = require("jimp");
+Jimp.read(buffer, function(err, image) {
+var qr = new QrCode();
+qr.callback = function(err, value) {
+console.log(value.result);
+m.reply(value.result)     
+};
+qr.decode(image.bitmap);
+ });
+ }
+ break
 case 'jodohku': {
 if (!m.isGroup) throw mess.group
 let member = participants.map(u => u.id)
@@ -890,13 +1042,33 @@ let buttons3 = [
 {buttonId: `menu`, buttonText: {displayText: 'BACK MENU'}, type: 1},
 ]
 let buttonMessage3 = {
-text: `DONT NOT SPAM OWNER!! `,
+text: `Ga Penting Ga Ush Chat....!!`,
 footerText: 'Press The Button Below',
 buttons: buttons3,
 headerType: 2
 }
 zbot.sendMessage(m.chat, buttonMessage3, { quoted: ftroli })                        
 }
+break
+case 'wm': case 'swm': {
+if (!text) throw `Example : !swm packname|author`
+top = text.split('|')[0]
+bot = text.split('|')[1]
+            if (!quoted) throw`Example : #swm packname|author`
+            m.reply(mess.wait)
+            if (/image/.test(mime)) {
+            let media = await quoted.download()
+            let encmedia = await zbot.sendImageAsSticker(m.chat, media, m, { packname: top, author: bot })
+            await fs.unlinkSync(encmedia)
+            } else if (/video/.test(mime)) {
+            if ((quoted.msg || quoted).seconds > 11) return m.reply('Maksimal 10 detik!')
+            let media = await quoted.download()
+            let encmedia = await zbot.sendVideoAsSticker(m.chat, media, m, { packname: top, author: bot })
+            await fs.unlinkSync(encmedia)
+            } else {
+            throw `Send Image/Video With Caption ${prefix + command}\nVideo Duration 1-9 Seconds`
+            }
+            }
 break
 case 'toimage': case 'toimg': {
 if (!quoted) throw 'Reply Image'
@@ -910,8 +1082,6 @@ if (err) throw err
 let buffer = fs.readFileSync(ran)
 zbot.sendMessage(m.chat, { image: buffer }, { quoted: ftroli })
 fs.unlinkSync(ran)
-}).catch(e => {
-m.reply('Terjadi Kesalahan Mohon Tunggu Beberapa Hari Kedepan 🙂')
 })
 }
 break
@@ -958,78 +1128,30 @@ let users = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender :
 await zbot.updateBlockStatus(users, 'unblock').then((res) => m.reply(jsonformat(res))).catch((err) => m.reply(jsonformat(err)))
 }
 break
-case 'bc': case 'broadcast': case 'bcall': {
+case 'broadcast': case 'bc': {
 if (!isCreator) throw mess.owner
-if (!text) throw `Text mana?\n\nExample : ${prefix + command} fatih-san`
-let anu = await store.chats.all().map(v => v.id)
-m.reply(`Mengirim Broadcast Ke ${anu.length} Chat\nWaktu Selesai ${anu.length * 1.5} detik`)
-for (let yoi of anu) {
-await sleep(1500)
-let txt = `*${text}*`
-let buttons = [
-            {buttonId: `${prefix}owner`, buttonText: {displayText: 'Owner'}, type: 1}
-            ]
-            let buttonMessage = {
-            document: image,
-            mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            fileName: `Izin Broadcast Bang`,
-            fileLength: 99999999999999,
-            caption: txt,
-            footer: `Z-Bot Multidevice`,
-            buttons: buttons,
-            headerType: 4,
-            contextInfo:{externalAdReply:{
-            title:`Broadcast Z-Bot`,
-            mediaType: 1,
-            renderLargerThumbnail: true , 
-            showAdAttribution: true, 
-            jpegThumbnail: image,
-            mediaUrl: `instagram.com/_daaa_1`,
-            thumbnail: image,
-            sourceUrl: ` `
-            }}
-            }
-            zbot.sendMessage(m.chat, buttonMessage, { quoted: m })
-}
-m.reply('Sukses Broadcast')
-}
-break
-case 'bcgc': case 'bcgroup': {
-if (!isCreator) throw mess.owner
-if (!text) throw `Text mana?\n\nExample : ${prefix + command} fatih-san`
+if (!q) return m.reply('masukan text nya')
 let getGroups = await zbot.groupFetchAllParticipating()
 let groups = Object.entries(getGroups).slice(0).map(entry => entry[1])
 let anu = groups.map(v => v.id)
+let data_teks = `${q}`
 m.reply(`Mengirim Broadcast Ke ${anu.length} Group Chat, Waktu Selesai ${anu.length * 1.5} detik`)
 for (let i of anu) {
 await sleep(1500)
-let txt = `*${text}*`
 let buttons = [
-            {buttonId: `${prefix}owner`, buttonText: {displayText: 'Owner'}, type: 1}
+{ buttonId: '.owner', buttonText: { displayText: 'Owner' }, type: 1 }, { buttonId: '.ping', buttonText: { displayText: 'Ping' }, type: 1 }
             ]
-            let buttonMessage = {
-            document: image,
-            mimetype: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            fileName: `Izin Broadcast Bang`,
-            fileLength: 99999999999999,
-            caption: txt,
-            footer: `Z-Bot Multidevice`,
-            buttons: buttons,
-            headerType: 4,
-            contextInfo:{externalAdReply:{
-            title:`Broadcast Z-Bot`,
-            mediaType: 1,
-            renderLargerThumbnail: true , 
-            showAdAttribution: true, 
-            jpegThumbnail: image,
-            mediaUrl: `instagram.com/_daaa_1`,
-            thumbnail: image,
-            sourceUrl: ` `
-            }}
-            }
-            zbot.sendMessage(m.chat, buttonMessage, { quoted: m })
+let buttonMessage = {
+                image: {url: `https://fileup.to/9u2p/TextPro.me_163e0457ca550e.jpg`},
+                fileLength: 100,
+                caption: `      *༺ᏴᎡϴᎪᎠᏟᎪՏͲ༻*`,
+                footer: data_teks + `\n\n\nZbot Broadcast`,
+                buttons: buttons,
+                headerType: 4
+                }
+zbot.sendMessage(i, buttonMessage, { quoted: m })
 }
-m.reply(`Sukses Mengirim Broadcast Ke ${anu.length} Group`)
+m.reply(`*Sukses mengirim broadcast*`)
 }
 break
 
